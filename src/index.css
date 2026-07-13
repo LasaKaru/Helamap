@@ -1,0 +1,107 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+    text-size-adjust: 100%;
+  }
+  body {
+    @apply font-sans antialiased bg-ink-50 text-ink-900 dark:bg-ink-950 dark:text-ink-100;
+    overscroll-behavior-y: none;
+  }
+  ::selection {
+    @apply bg-blue-500/30;
+  }
+}
+
+@layer components {
+  .glass {
+    @apply bg-white/75 dark:bg-ink-900/70 backdrop-blur-xl border border-white/50 dark:border-white/10 shadow-glass;
+  }
+  .glass-strong {
+    @apply bg-white/90 dark:bg-ink-900/90 backdrop-blur-2xl border border-white/60 dark:border-white/10 shadow-glass;
+  }
+  .input {
+    @apply w-full rounded-xl border border-ink-200 dark:border-ink-700 bg-white dark:bg-ink-900
+      px-3.5 py-2.5 text-sm text-ink-900 dark:text-ink-100 placeholder-ink-400
+      focus:outline-none focus:ring-2 focus:ring-blue-500/60 focus:border-blue-500/60 transition;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold
+      transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/70
+      disabled:opacity-50 disabled:pointer-events-none active:scale-[0.97] select-none;
+  }
+  .btn-primary {
+    @apply btn bg-blue-600 text-white hover:bg-blue-500 shadow-soft;
+  }
+  .btn-ghost {
+    @apply btn bg-transparent text-ink-700 dark:text-ink-200 hover:bg-ink-100 dark:hover:bg-ink-800;
+  }
+  .btn-outline {
+    @apply btn border border-ink-200 dark:border-ink-700 text-ink-800 dark:text-ink-100
+      bg-white dark:bg-ink-900 hover:bg-ink-50 dark:hover:bg-ink-800;
+  }
+  .btn-danger {
+    @apply btn bg-red-600/10 text-red-600 dark:text-red-400 hover:bg-red-600/20;
+  }
+  .btn-success {
+    @apply btn bg-emerald-600 text-white hover:bg-emerald-500 shadow-soft;
+  }
+  .card {
+    @apply rounded-2xl bg-white dark:bg-ink-900 border border-ink-100 dark:border-ink-800 shadow-soft;
+  }
+  .label {
+    @apply block text-xs font-semibold uppercase tracking-wide text-ink-500 dark:text-ink-400 mb-1.5;
+  }
+  .skeleton {
+    @apply rounded-lg bg-gradient-to-r from-ink-100 via-ink-200 to-ink-100
+      dark:from-ink-800 dark:via-ink-700 dark:to-ink-800 bg-[length:400px_100%] animate-shimmer;
+  }
+}
+
+/* Thin, unobtrusive scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(120, 135, 160, 0.4) transparent;
+}
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+*::-webkit-scrollbar-thumb {
+  background: rgba(120, 135, 160, 0.4);
+  border-radius: 999px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Floor plan images read as "paper" — dim slightly in dark mode */
+.dark .floorplan-image {
+  filter: brightness(0.82) saturate(0.9);
+}
+
+/* Safe-area helpers for notched phones */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.pt-safe {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+/* Ambient industrial grid backdrop for hero surfaces */
+.ambient-grid {
+  background-image:
+    radial-gradient(ellipse 80% 60% at 50% -10%, rgba(59, 130, 246, 0.18), transparent),
+    linear-gradient(rgba(120, 140, 170, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(120, 140, 170, 0.07) 1px, transparent 1px);
+  background-size: 100% 100%, 44px 44px, 44px 44px;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}

@@ -1,0 +1,213 @@
+import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import {
+  ArrowRight,
+  Compass,
+  Lock,
+  Map,
+  QrCode,
+  ScanLine,
+  ShieldCheck,
+  Smartphone,
+  Zap,
+} from 'lucide-react';
+import { useMapData } from '../hooks/useMapData';
+import { countStats } from '../lib/data';
+import Logo from '../components/ui/Logo';
+import ThemeToggle from '../components/ui/ThemeToggle';
+
+const fadeUp = {
+  initial: { opacity: 0, y: 24 },
+  animate: { opacity: 1, y: 0 },
+};
+
+export default function LandingPage() {
+  const { data } = useMapData();
+  const stats = data ? countStats(data) : null;
+
+  return (
+    <div className="ambient-grid min-h-screen">
+      {/* Nav */}
+      <header className="mx-auto flex max-w-5xl items-center justify-between px-5 py-5">
+        <div className="flex items-center gap-3">
+          <Logo settings={data} />
+          <div>
+            <p className="text-sm font-bold leading-tight">
+              {data?.appName ?? 'HelaMap'}
+            </p>
+            <p className="text-[11px] text-ink-500 leading-tight">
+              {data?.companyName ?? ''}
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <ThemeToggle />
+          <Link to="/admin" className="btn-ghost !px-3" aria-label="Admin panel">
+            <Lock className="h-4 w-4" />
+            <span className="hidden sm:inline">Admin</span>
+          </Link>
+        </div>
+      </header>
+
+      {/* Hero */}
+      <main className="mx-auto max-w-5xl px-5 pb-20">
+        <section className="pt-10 sm:pt-20 text-center">
+          <motion.div
+            {...fadeUp}
+            transition={{ duration: 0.5 }}
+            className="mx-auto inline-flex items-center gap-2 rounded-full border border-blue-500/30 bg-blue-500/10 px-4 py-1.5 text-xs font-semibold text-blue-600 dark:text-blue-400"
+          >
+            <ScanLine className="h-3.5 w-3.5" />
+            Scan the QR code at the entrance
+          </motion.div>
+
+          <motion.h1
+            {...fadeUp}
+            transition={{ duration: 0.5, delay: 0.08 }}
+            className="mx-auto mt-6 max-w-2xl text-4xl sm:text-6xl font-extrabold tracking-tight"
+          >
+            Find your way,
+            <span className="bg-gradient-to-r from-blue-500 via-cyan-400 to-emerald-400 bg-clip-text text-transparent">
+              {' '}
+              from day one.
+            </span>
+          </motion.h1>
+
+          <motion.p
+            {...fadeUp}
+            transition={{ duration: 0.5, delay: 0.16 }}
+            className="mx-auto mt-5 max-w-xl text-base sm:text-lg text-ink-500 dark:text-ink-400"
+          >
+            {data?.welcomeMessage ??
+              'An interactive facility map for new hires and daily staff. Pan, zoom and tap any zone to see what happens there, who to contact, and what safety gear you need.'}
+          </motion.p>
+
+          <motion.div
+            {...fadeUp}
+            transition={{ duration: 0.5, delay: 0.24 }}
+            className="mt-8 flex flex-wrap items-center justify-center gap-3"
+          >
+            <Link to="/map" className="btn-primary !px-6 !py-3 !text-base">
+              <Map className="h-5 w-5" />
+              Open the map
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+            <Link to="/qr" className="btn-outline !px-6 !py-3 !text-base">
+              <QrCode className="h-5 w-5" />
+              QR codes
+            </Link>
+          </motion.div>
+
+          {stats && (
+            <motion.div
+              {...fadeUp}
+              transition={{ duration: 0.5, delay: 0.32 }}
+              className="mx-auto mt-12 grid max-w-md grid-cols-3 gap-3"
+            >
+              <Stat value={stats.buildings} label="Buildings" />
+              <Stat value={stats.floors} label="Floors" />
+              <Stat value={stats.zones} label="Zones" />
+            </motion.div>
+          )}
+        </section>
+
+        {/* Features */}
+        <section className="mt-20 grid gap-4 sm:grid-cols-3">
+          <Feature
+            icon={<Smartphone className="h-5 w-5" />}
+            title="Instant on mobile"
+            text="Opens in the browser the moment a QR code is scanned. No app installs, no accounts, works offline-friendly."
+            delay={0}
+          />
+          <Feature
+            icon={<Compass className="h-5 w-5" />}
+            title="Tap-to-explore zones"
+            text="Every area — inventory, planning, assembly, canteen — is tappable with contacts, photos and details."
+            delay={0.1}
+          />
+          <Feature
+            icon={<ShieldCheck className="h-5 w-5" />}
+            title="Safety first"
+            text="PPE requirements and hazard notes surface right where people need them, before they walk in."
+            delay={0.2}
+          />
+        </section>
+
+        {/* How it works */}
+        <section className="card mt-16 p-6 sm:p-8">
+          <h2 className="text-lg font-bold">How it works</h2>
+          <ol className="mt-5 grid gap-5 sm:grid-cols-3">
+            {[
+              ['Scan', 'A QR code at the entrance (or any zone) opens the live map at that exact spot.'],
+              ['Explore', 'Pinch, zoom and tap zones for descriptions, contacts and safety notes.'],
+              ['Navigate', 'Follow the animated route from where you stand to where you need to be.'],
+            ].map(([title, text], i) => (
+              <li key={title} className="flex gap-4">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-600/10 text-sm font-bold text-blue-600 dark:text-blue-400">
+                  {i + 1}
+                </span>
+                <div>
+                  <p className="font-semibold">{title}</p>
+                  <p className="mt-1 text-sm text-ink-500 dark:text-ink-400">{text}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </section>
+      </main>
+
+      {/* Footer */}
+      <footer className="border-t border-ink-100 dark:border-ink-800/60 py-8">
+        <div className="mx-auto flex max-w-5xl flex-col items-center gap-2 px-5 text-center text-xs text-ink-400">
+          <p className="flex items-center gap-1.5 font-semibold text-ink-500">
+            <Zap className="h-3.5 w-3.5" />
+            {data?.appName ?? 'HelaMap'} · 100% static, zero backend
+          </p>
+          {data?.address && <p>{data.address}</p>}
+          <p>
+            {[data?.contactEmail, data?.contactPhone].filter(Boolean).join(' · ')}
+          </p>
+        </div>
+      </footer>
+    </div>
+  );
+}
+
+function Stat({ value, label }: { value: number; label: string }) {
+  return (
+    <div className="glass rounded-2xl px-4 py-3.5">
+      <p className="text-2xl font-extrabold">{value}</p>
+      <p className="text-[11px] font-semibold uppercase tracking-wider text-ink-400">
+        {label}
+      </p>
+    </div>
+  );
+}
+
+function Feature({
+  icon,
+  title,
+  text,
+  delay,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  text: string;
+  delay: number;
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-40px' }}
+      transition={{ duration: 0.5, delay }}
+      className="card p-6"
+    >
+      <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600/10 text-blue-600 dark:text-blue-400">
+        {icon}
+      </div>
+      <h3 className="mt-4 font-bold">{title}</h3>
+      <p className="mt-1.5 text-sm leading-relaxed text-ink-500 dark:text-ink-400">{text}</p>
+    </motion.div>
+  );
+}
