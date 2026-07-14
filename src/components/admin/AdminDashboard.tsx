@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { animate, motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
   ArrowRight,
   BarChart3,
@@ -19,6 +19,7 @@ import { getViewCounts } from '../../lib/prefs';
 import { api } from '../../lib/api';
 import { ZoneIcon } from '../../lib/icons';
 import { assetUrl, formatDate } from '../../lib/utils';
+import { HeroStat, Timecode } from '../ui/cinematic';
 
 /**
  * Cinematic "shoot view" dashboard: a widescreen dark hero with a slow
@@ -81,7 +82,7 @@ export default function AdminDashboard({
             <motion.img
               src={heroImage}
               alt=""
-              className="h-full w-full object-cover opacity-25 saturate-50"
+              className="h-full w-full object-cover opacity-[0.16] invert saturate-0"
               initial={{ scale: 1.08, x: '-1.5%', y: '-1%' }}
               animate={{ scale: 1.22, x: '2%', y: '2%' }}
               transition={{ duration: 26, ease: 'linear', repeat: Infinity, repeatType: 'mirror' }}
@@ -202,59 +203,6 @@ export default function AdminDashboard({
 }
 
 /* ── pieces ─────────────────────────────────────────────────────── */
-
-/** Live HH:MM:SS:FF timecode, 25 fps — the little director's-monitor touch. */
-function Timecode() {
-  const [now, setNow] = useState(() => new Date());
-  useEffect(() => {
-    const t = setInterval(() => setNow(new Date()), 40);
-    return () => clearInterval(t);
-  }, []);
-  const pad = (n: number) => String(n).padStart(2, '0');
-  const frames = pad(Math.floor(now.getMilliseconds() / 40));
-  return (
-    <span className="tabular-nums" aria-hidden="true">
-      TC {pad(now.getHours())}:{pad(now.getMinutes())}:{pad(now.getSeconds())}:{frames}
-    </span>
-  );
-}
-
-function CountUp({ value }: { value: number }) {
-  const [display, setDisplay] = useState(0);
-  useEffect(() => {
-    const controls = animate(0, value, {
-      duration: 1.1,
-      ease: 'easeOut',
-      onUpdate: (v) => setDisplay(Math.round(v)),
-    });
-    return () => controls.stop();
-  }, [value]);
-  return <>{display}</>;
-}
-
-function HeroStat({
-  icon,
-  value,
-  text,
-  label,
-}: {
-  icon: React.ReactNode;
-  value?: number;
-  text?: string;
-  label: string;
-}) {
-  return (
-    <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 backdrop-blur">
-      <div className="flex items-center gap-1.5 text-white/50">{icon}</div>
-      <p className="mt-1.5 text-2xl font-extrabold tabular-nums leading-none">
-        {value !== undefined ? <CountUp value={value} /> : <span className="text-sm">{text}</span>}
-      </p>
-      <p className="mt-1 text-[10px] font-semibold uppercase tracking-wider text-white/40">
-        {label}
-      </p>
-    </div>
-  );
-}
 
 /**
  * Top zones chart. Backend Mode pulls real server analytics; Static Mode
