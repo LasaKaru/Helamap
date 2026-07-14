@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450">
+  <defs>
+    <linearGradient id="warm" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#064e3b"/>
+      <stop offset="1" stop-color="#10b981"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="450" fill="url(#warm)"/>
+  <g opacity="0.9">
+    <circle cx="180" cy="260" r="70" fill="#065f46"/>
+    <circle cx="400" cy="230" r="80" fill="#047857"/>
+    <circle cx="620" cy="270" r="70" fill="#065f46"/>
+    <g fill="#a7f3d0">
+      <circle cx="180" cy="260" r="26"/>
+      <circle cx="400" cy="230" r="30"/>
+      <circle cx="620" cy="270" r="26"/>
+    </g>
+    <g stroke="#a7f3d0" stroke-width="6" stroke-linecap="round">
+      <line x1="150" y1="150" x2="150" y2="120"/>
+      <line x1="180" y1="150" x2="180" y2="112"/>
+      <line x1="210" y1="150" x2="210" y2="120"/>
+    </g>
+  </g>
+  <rect y="380" width="800" height="70" fill="#022c22"/>
+  <text x="400" y="425" text-anchor="middle" fill="#a7f3d0" font-family="ui-sans-serif, system-ui" font-size="26" font-weight="600" letter-spacing="3">STAFF CANTEEN · OPEN 06:30 – 15:30</text>
+</svg>

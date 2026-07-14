@@ -1,0 +1,120 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2000 1400" font-family="ui-sans-serif, system-ui, sans-serif">
+  <defs>
+    <pattern id="grid" width="50" height="50" patternUnits="userSpaceOnUse">
+      <path d="M 50 0 L 0 0 0 50" fill="none" stroke="#dbe3ee" stroke-width="1"/>
+    </pattern>
+    <pattern id="hatch" width="12" height="12" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="12" stroke="#c3cede" stroke-width="4"/>
+    </pattern>
+  </defs>
+
+  <rect width="2000" height="1400" fill="#f4f7fb"/>
+  <rect width="2000" height="1400" fill="url(#grid)"/>
+
+  <!-- outer wall -->
+  <rect x="60" y="240" width="1880" height="1120" fill="#ffffff" stroke="#8798b0" stroke-width="10"/>
+  <rect x="60" y="240" width="1880" height="1120" fill="none" stroke="#42536b" stroke-width="3"/>
+
+  <!-- column grid labels -->
+  <g fill="#7c8ca3" font-size="30" font-weight="600">
+    <text x="360" y="215" text-anchor="middle">A</text>
+    <text x="760" y="215" text-anchor="middle">B</text>
+    <text x="1160" y="215" text-anchor="middle">C</text>
+    <text x="1560" y="215" text-anchor="middle">D</text>
+    <text x="30" y="470" text-anchor="middle">1</text>
+    <text x="30" y="830" text-anchor="middle">2</text>
+    <text x="30" y="1190" text-anchor="middle">3</text>
+  </g>
+
+  <!-- rooms -->
+  <g fill="#fbfdff" stroke="#5b6d87" stroke-width="4">
+    <rect x="100" y="300" width="600" height="600"/>   <!-- inventory -->
+    <rect x="780" y="300" width="520" height="480"/>   <!-- bamburio -->
+    <rect x="1380" y="300" width="500" height="340"/>  <!-- qc -->
+    <rect x="1380" y="720" width="500" height="360"/>  <!-- shipping -->
+    <rect x="100" y="980" width="460" height="320"/>   <!-- canteen -->
+    <rect x="640" y="980" width="260" height="320"/>   <!-- first aid -->
+    <rect x="980" y="1140" width="320" height="180"/>  <!-- entrance -->
+  </g>
+
+  <!-- racking rows in inventory -->
+  <g fill="url(#hatch)" stroke="#9fb0c6" stroke-width="2">
+    <rect x="150" y="360" width="500" height="50"/>
+    <rect x="150" y="470" width="500" height="50"/>
+    <rect x="150" y="580" width="500" height="50"/>
+    <rect x="150" y="690" width="500" height="50"/>
+  </g>
+
+  <!-- assembly line in bamburio -->
+  <g stroke="#9fb0c6" stroke-width="3" fill="#eef3f9">
+    <rect x="830" y="380" width="420" height="70" rx="8"/>
+    <rect x="830" y="520" width="420" height="70" rx="8"/>
+    <circle cx="900" cy="670" r="34"/>
+    <circle cx="1040" cy="670" r="34"/>
+    <circle cx="1180" cy="670" r="34"/>
+  </g>
+
+  <!-- QC benches -->
+  <g stroke="#9fb0c6" stroke-width="3" fill="#eef3f9">
+    <rect x="1430" y="360" width="180" height="60" rx="6"/>
+    <rect x="1660" y="360" width="180" height="60" rx="6"/>
+    <rect x="1430" y="500" width="180" height="60" rx="6"/>
+    <rect x="1660" y="500" width="180" height="60" rx="6"/>
+  </g>
+
+  <!-- shipping dock doors -->
+  <g stroke="#5b6d87" stroke-width="4" fill="#dde7f2">
+    <rect x="1880" y="760" width="30" height="70"/>
+    <rect x="1880" y="860" width="30" height="70"/>
+    <rect x="1880" y="960" width="30" height="70"/>
+  </g>
+  <g fill="#7c8ca3" font-size="24" font-weight="600">
+    <text x="1930" y="805" text-anchor="start">D1</text>
+    <text x="1930" y="905" text-anchor="start">D2</text>
+    <text x="1930" y="1005" text-anchor="start">D3</text>
+  </g>
+
+  <!-- canteen tables -->
+  <g stroke="#9fb0c6" stroke-width="3" fill="#eef3f9">
+    <circle cx="200" cy="1080" r="36"/>
+    <circle cx="330" cy="1080" r="36"/>
+    <circle cx="460" cy="1080" r="36"/>
+    <circle cx="200" cy="1210" r="36"/>
+    <circle cx="330" cy="1210" r="36"/>
+    <circle cx="460" cy="1210" r="36"/>
+  </g>
+
+  <!-- first aid cross -->
+  <g fill="#e5ecf5">
+    <rect x="740" y="1090" width="60" height="160" rx="8"/>
+    <rect x="690" y="1140" width="160" height="60" rx="8"/>
+  </g>
+
+  <!-- entrance door gap + arrow -->
+  <rect x="1060" y="1338" width="160" height="26" fill="#f4f7fb"/>
+  <g stroke="#42536b" stroke-width="5" fill="none">
+    <path d="M 1140 1420 L 1140 1250"/>
+    <path d="M 1115 1285 L 1140 1250 L 1165 1285"/>
+  </g>
+  <text x="1140" y="1395" text-anchor="middle" fill="#42536b" font-size="26" font-weight="700" transform="translate(120,0)">ENTRANCE</text>
+
+  <!-- corridors -->
+  <g stroke="#c3cede" stroke-width="2" stroke-dasharray="14 10" fill="none">
+    <line x1="740" y1="300" x2="740" y2="1300"/>
+    <line x1="1340" y1="300" x2="1340" y2="1080"/>
+    <line x1="100" y1="940" x2="1880" y2="940" transform="translate(0,-10)"/>
+  </g>
+
+  <!-- north arrow + scale -->
+  <g transform="translate(1870,110)">
+    <circle r="46" fill="#ffffff" stroke="#8798b0" stroke-width="3"/>
+    <path d="M 0 -30 L 14 20 L 0 10 L -14 20 Z" fill="#42536b"/>
+    <text y="-56" text-anchor="middle" fill="#42536b" font-size="26" font-weight="700">N</text>
+  </g>
+  <g transform="translate(90,120)">
+    <text y="-14" fill="#7c8ca3" font-size="24" font-weight="600">MAIN PRODUCTION HALL · GROUND FLOOR · 1:200</text>
+    <rect x="0" y="0" width="100" height="12" fill="#42536b"/>
+    <rect x="100" y="0" width="100" height="12" fill="#ffffff" stroke="#42536b" stroke-width="2"/>
+    <text x="210" y="12" fill="#7c8ca3" font-size="22">10 m</text>
+  </g>
+</svg>

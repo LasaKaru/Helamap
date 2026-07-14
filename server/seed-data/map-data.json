@@ -1,0 +1,297 @@
+{
+  "appName": "FacilityFlow",
+  "companyName": "Lanka Tyre & Rubber Co.",
+  "tagline": "Find your way from day one",
+  "logo": "",
+  "primaryColor": "#3B82F6",
+  "contactEmail": "facilities@lankatyre.example",
+  "contactPhone": "+94 11 234 5678",
+  "address": "Industrial Zone 4, Biyagama, Sri Lanka",
+  "website": "https://lankatyre.example",
+  "welcomeMessage": "Welcome aboard! Tap any zone on the map to learn what happens there, who to contact, and what safety gear you need.",
+  "version": "1.1.0",
+  "lastUpdated": "2026-07-13T12:00:00Z",
+  "buildings": [
+    {
+      "id": "b1",
+      "name": "Main Production Hall",
+      "description": "Primary manufacturing & inventory complex",
+      "floors": [
+        {
+          "id": "f1",
+          "name": "Ground Floor",
+          "level": 0,
+          "mapImage": "/maps/main-ground.svg",
+          "mapWidth": 2000,
+          "mapHeight": 1400,
+          "zones": [
+            {
+              "id": "z-inventory",
+              "name": "Main Inventory Section",
+              "shortName": "Inventory",
+              "color": "#3B82F6",
+              "icon": "package",
+              "description": "Central warehouse for raw materials and finished goods. Safety shoes mandatory.",
+              "details": "• Capacity: 12,000 pallets\n• Contact: inventory@lankatyre.example\n• Open 24/7 — three shifts\n• Forklift charging bays along the west wall",
+              "safetyNotes": "Wear a high-visibility vest and safety shoes. Forklift traffic is active at all times — stay inside the green pedestrian lanes.",
+              "polygon": [[100, 300], [700, 300], [700, 900], [100, 900]],
+              "center": [400, 600],
+              "photo": "/photos/inventory.svg",
+              "isHighlighted": false,
+              "tags": ["warehouse", "high-traffic"],
+              "status": "busy",
+              "translations": {
+                "si": {
+                  "name": "ප්‍රධාන තොග අංශය",
+                  "shortName": "තොග",
+                  "description": "අමුද්‍රව්‍ය සහ නිමි භාණ්ඩ සඳහා මධ්‍යම ගබඩාව. ආරක්ෂිත සපත්තු අනිවාර්යයි."
+                }
+              }
+            },
+            {
+              "id": "z-bamburio",
+              "name": "Bamburio Assembly Zone",
+              "shortName": "Bamburio",
+              "color": "#F59E0B",
+              "icon": "cpu",
+              "description": "Specialized Bamburio product line assembly — our flagship radial tyre series.",
+              "details": "• Line speed: 380 units / shift\n• Team lead: K. Perera (ext. 214)\n• Tooling stored in cage B-4\n• Kaizen board at the north entrance",
+              "safetyNotes": "Hearing protection required. Keep clear of the yellow robot envelope markings.",
+              "polygon": [[780, 300], [1300, 300], [1300, 780], [780, 780]],
+              "center": [1040, 540],
+              "isHighlighted": false,
+              "tags": ["production", "high-traffic"]
+            },
+            {
+              "id": "z-qc",
+              "name": "Quality Control Lab",
+              "shortName": "QC Lab",
+              "color": "#8B5CF6",
+              "icon": "shield-check",
+              "description": "Inspection, testing and certification of every production batch.",
+              "details": "• Batch sampling every 2 hours\n• Contact: qc@lankatyre.example\n• ISO 9001 documentation kept here",
+              "safetyNotes": "Lab coats and safety glasses required beyond the blue line.",
+              "polygon": [[1380, 300], [1880, 300], [1880, 640], [1380, 640]],
+              "center": [1630, 470],
+              "isHighlighted": false,
+              "tags": ["lab", "restricted"]
+            },
+            {
+              "id": "z-shipping",
+              "name": "Shipping & Dispatch Dock",
+              "shortName": "Shipping",
+              "color": "#06B6D4",
+              "icon": "truck",
+              "description": "Outbound goods staging, container loading and courier pickup.",
+              "details": "• Dock doors: 6 (D1–D6)\n• Cut-off for same-day dispatch: 15:30\n• Contact: dispatch@lankatyre.example",
+              "safetyNotes": "Dock edges are fall hazards. Never stand behind a reversing truck — use the banksman.",
+              "polygon": [[1380, 720], [1880, 720], [1880, 1080], [1380, 1080]],
+              "center": [1630, 900],
+              "isHighlighted": false,
+              "isExit": true,
+              "tags": ["logistics", "high-traffic"]
+            },
+            {
+              "id": "z-canteen",
+              "name": "Staff Canteen",
+              "shortName": "Canteen",
+              "color": "#10B981",
+              "icon": "coffee",
+              "description": "Meals, tea breaks and the best string hoppers in the industrial zone.",
+              "details": "• Breakfast: 06:30 – 08:00\n• Lunch: 11:30 – 13:30\n• Tea: 15:00 – 15:30\n• Vegetarian options daily",
+              "polygon": [[100, 980], [560, 980], [560, 1300], [100, 1300]],
+              "center": [330, 1140],
+              "photo": "/photos/canteen.svg",
+              "isHighlighted": false,
+              "tags": ["food", "break-area"],
+              "translations": {
+                "si": {
+                  "name": "කාර්ය මණ්ඩල ආපනශාලාව",
+                  "shortName": "ආපනශාලාව",
+                  "description": "ආහාර වේල්, තේ විවේක සහ කලාපයේ හොඳම ඉඳිආප්ප."
+                }
+              }
+            },
+            {
+              "id": "z-firstaid",
+              "name": "First Aid & Medical Room",
+              "shortName": "First Aid",
+              "color": "#EF4444",
+              "icon": "heart-pulse",
+              "description": "First aid station with a trained medic on every shift.",
+              "details": "• Emergency internal line: 999\n• AED mounted outside the door\n• Eye-wash station inside",
+              "safetyNotes": "In an emergency call 999 from any internal phone, then send a runner here.",
+              "polygon": [[640, 980], [900, 980], [900, 1300], [640, 1300]],
+              "center": [770, 1140],
+              "isHighlighted": false,
+              "tags": ["safety", "medical"],
+              "translations": {
+                "si": {
+                  "name": "ප්‍රථමාධාර සහ වෛද්‍ය කාමරය",
+                  "shortName": "ප්‍රථමාධාර",
+                  "description": "සෑම වැඩමුරයකම පුහුණු වෛද්‍ය සහායකයෙකු සිටින ප්‍රථමාධාර මධ්‍යස්ථානය."
+                }
+              }
+            },
+            {
+              "id": "z-entrance",
+              "name": "Main Entrance & Reception",
+              "shortName": "Entrance",
+              "color": "#64748B",
+              "icon": "door-open",
+              "description": "Security check-in, visitor badges and the QR onboarding point.",
+              "details": "• All visitors must sign in here\n• Lockers available for personal items\n• Scan the wall QR to reopen this map anytime",
+              "polygon": [[980, 1140], [1300, 1140], [1300, 1320], [980, 1320]],
+              "center": [1140, 1230],
+              "isHighlighted": false,
+              "isExit": true,
+              "tags": ["entrance", "safety"],
+              "translations": {
+                "si": {
+                  "name": "ප්‍රධාන පිවිසුම සහ පිළිගැනීම",
+                  "shortName": "පිවිසුම",
+                  "description": "ආරක්ෂක ලියාපදිංචිය, අමුත්තන්ගේ බැජ් සහ QR ආරම්භක ස්ථානය."
+                }
+              }
+            },
+            {
+              "id": "z-stairs-g",
+              "name": "Stairwell A",
+              "shortName": "Stairs",
+              "color": "#64748B",
+              "icon": "arrow-up-down",
+              "description": "Main stairwell connecting the ground and first floors.",
+              "polygon": [[1340, 1140], [1500, 1140], [1500, 1320], [1340, 1320]],
+              "center": [1420, 1230],
+              "connectsToFloorId": "f2",
+              "tags": ["stairs"]
+            }
+          ]
+        },
+        {
+          "id": "f2",
+          "name": "First Floor",
+          "level": 1,
+          "mapImage": "/maps/main-first.svg",
+          "mapWidth": 2000,
+          "mapHeight": 1400,
+          "zones": [
+            {
+              "id": "z-calendar",
+              "name": "Calendar & Production Planning",
+              "shortName": "Calendar",
+              "color": "#10B981",
+              "icon": "calendar",
+              "description": "Daily production schedule board and planning office.",
+              "details": "• Current shift: Morning A\n• Today's target: 4,200 units\n• Planning stand-up at 08:15 daily",
+              "polygon": [[100, 300], [700, 300], [700, 760], [100, 760]],
+              "center": [400, 530],
+              "isHighlighted": false,
+              "tags": ["office", "planning"]
+            },
+            {
+              "id": "z-admin",
+              "name": "Admin Offices",
+              "shortName": "Admin",
+              "color": "#3B82F6",
+              "icon": "briefcase",
+              "description": "HR, finance and general administration. New-hire paperwork happens here.",
+              "details": "• HR desk hours: 08:00 – 17:00\n• Contact: hr@lankatyre.example\n• Bring your NIC for onboarding",
+              "polygon": [[780, 300], [1300, 300], [1300, 760], [780, 760]],
+              "center": [1040, 530],
+              "isHighlighted": false,
+              "tags": ["office", "hr"]
+            },
+            {
+              "id": "z-meeting",
+              "name": "Meeting Rooms",
+              "shortName": "Meetings",
+              "color": "#F59E0B",
+              "icon": "users",
+              "description": "Bookable meeting rooms M1–M4 and the town-hall space.",
+              "details": "• Book via reception or the wall tablets\n• M4 has video conferencing",
+              "polygon": [[1380, 300], [1880, 300], [1880, 760], [1380, 760]],
+              "center": [1630, 530],
+              "isHighlighted": false,
+              "tags": ["office", "meetings"],
+              "status": "busy"
+            },
+            {
+              "id": "z-rnd",
+              "name": "R&D Laboratory",
+              "shortName": "R&D Lab",
+              "color": "#8B5CF6",
+              "icon": "flask-conical",
+              "description": "Compound research, prototyping and materials testing.",
+              "details": "• Restricted access — escort required\n• Contact: rnd@lankatyre.example",
+              "safetyNotes": "Authorized personnel only. Chemical storage inside — no food or drink.",
+              "polygon": [[100, 860], [900, 860], [900, 1300], [100, 1300]],
+              "center": [500, 1080],
+              "isHighlighted": false,
+              "tags": ["lab", "restricted"]
+            },
+            {
+              "id": "z-stairs-1",
+              "name": "Stairwell A",
+              "shortName": "Stairs",
+              "color": "#64748B",
+              "icon": "arrow-up-down",
+              "description": "Main stairwell connecting the first and ground floors.",
+              "polygon": [[930, 1150], [1130, 1150], [1130, 1290], [930, 1290]],
+              "center": [1030, 1220],
+              "connectsToFloorId": "f1",
+              "tags": ["stairs"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "b2",
+      "name": "Warehouse Annex",
+      "description": "Overflow storage and packaging operations",
+      "floors": [
+        {
+          "id": "f3",
+          "name": "Ground Floor",
+          "level": 0,
+          "mapImage": "/maps/warehouse-ground.svg",
+          "mapWidth": 1600,
+          "mapHeight": 1200,
+          "zones": [
+            {
+              "id": "z-rawmat",
+              "name": "Raw Materials Storage",
+              "shortName": "Raw Materials",
+              "color": "#3B82F6",
+              "icon": "boxes",
+              "description": "Bulk rubber, steel cord and chemical compound storage.",
+              "details": "• FIFO rotation enforced\n• Temperature-controlled bays R1–R3\n• Contact: rawstore@lankatyre.example",
+              "safetyNotes": "High-stacked racking — hard hats mandatory in all aisles.",
+              "polygon": [[100, 250], [900, 250], [900, 950], [100, 950]],
+              "center": [500, 600],
+              "isHighlighted": false,
+              "tags": ["warehouse"],
+              "status": "low-stock"
+            },
+            {
+              "id": "z-packaging",
+              "name": "Packaging Line",
+              "shortName": "Packaging",
+              "color": "#10B981",
+              "icon": "archive",
+              "description": "Final wrapping, labelling and palletising before dispatch.",
+              "details": "• Two automated wrap lines\n• Label printers in bay P2",
+              "safetyNotes": "Keep hands clear of the stretch-wrap turntable while it is in motion.",
+              "polygon": [[980, 250], [1500, 250], [1500, 950], [980, 950]],
+              "center": [1240, 600],
+              "isHighlighted": false,
+              "isExit": true,
+              "tags": ["production", "logistics"]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
