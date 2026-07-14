@@ -59,6 +59,39 @@
     @apply rounded-lg bg-gradient-to-r from-ink-100 via-ink-200 to-ink-100
       dark:from-ink-800 dark:via-ink-700 dark:to-ink-800 bg-[length:400px_100%] animate-shimmer;
   }
+  /* Rendered rich-text (legal pages, TipTap output) */
+  .prose-page h2 {
+    @apply text-2xl font-extrabold tracking-tight mt-2 mb-4;
+  }
+  .prose-page h3 {
+    @apply text-lg font-bold mt-6 mb-2;
+  }
+  .prose-page p {
+    @apply text-sm leading-relaxed text-ink-600 dark:text-ink-300 mb-3;
+  }
+  .prose-page ul,
+  .prose-page ol {
+    @apply mb-3 ml-5 space-y-1.5 text-sm text-ink-600 dark:text-ink-300;
+  }
+  .prose-page ul {
+    @apply list-disc;
+  }
+  .prose-page ol {
+    @apply list-decimal;
+  }
+  .prose-page a {
+    @apply text-blue-600 dark:text-blue-400 font-medium underline underline-offset-2;
+  }
+  .prose-page strong {
+    @apply text-ink-800 dark:text-ink-100;
+  }
+  .prose-page em {
+    @apply text-ink-400;
+  }
+  /* TipTap editor surface */
+  .tiptap-editor .ProseMirror {
+    @apply min-h-[320px] rounded-xl border border-ink-200 dark:border-ink-700 bg-white dark:bg-ink-900 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/60;
+  }
 }
 
 /* Thin, unobtrusive scrollbars */

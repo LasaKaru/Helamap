@@ -1,0 +1,32 @@
+# ── FacilityFlow: one-command full stack ──────────────────────────────
+# docker compose up --build
+# Frontend → http://localhost:8080   Backend API → http://localhost:4000
+services:
+  frontend:
+    build:
+      context: .
+      args:
+        SITE_URL: http://localhost:8080
+    ports:
+      - '8080:80'
+    depends_on:
+      - backend
+
+  backend:
+    build: ./server
+    ports:
+      - '4000:4000'
+    environment:
+      PORT: 4000
+      CORS_ORIGINS: http://localhost:8080,http://localhost:5173
+      DATABASE_PATH: /app/data/facilityflow.db
+      # ⚠️ Change these before production!
+      JWT_ACCESS_SECRET: change-me-access-secret
+      JWT_REFRESH_SECRET: change-me-refresh-secret
+      SEED_ADMIN_EMAIL: admin@facilityflow.local
+      SEED_ADMIN_PASSWORD: ChangeMe123!
+    volumes:
+      - facilityflow-data:/app/data
+
+volumes:
+  facilityflow-data:

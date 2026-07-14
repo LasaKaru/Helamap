@@ -12,7 +12,6 @@ import {
   ShieldCheck,
   Smartphone,
   Star,
-  Zap,
 } from 'lucide-react';
 import { useMapData } from '../hooks/useMapData';
 import { allZones, countStats } from '../lib/data';
@@ -21,6 +20,8 @@ import { useI18n } from '../lib/i18n';
 import { ZoneIcon } from '../lib/icons';
 import Logo from '../components/ui/Logo';
 import ThemeToggle from '../components/ui/ThemeToggle';
+import SiteFooter from '../components/ui/SiteFooter';
+import Seo, { organizationJsonLd } from '../components/ui/Seo';
 
 const fadeUp = {
   initial: { opacity: 0, y: 24 },
@@ -33,6 +34,7 @@ export default function LandingPage() {
 
   return (
     <div className="ambient-grid min-h-screen">
+      <Seo settings={data} jsonLd={data ? organizationJsonLd(data) : undefined} />
       {/* Nav */}
       <header className="mx-auto flex max-w-5xl items-center justify-between px-5 py-5">
         <div className="flex items-center gap-3">
@@ -164,19 +166,7 @@ export default function LandingPage() {
         </section>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-ink-100 dark:border-ink-800/60 py-8">
-        <div className="mx-auto flex max-w-5xl flex-col items-center gap-2 px-5 text-center text-xs text-ink-400">
-          <p className="flex items-center gap-1.5 font-semibold text-ink-500">
-            <Zap className="h-3.5 w-3.5" />
-            {data?.appName ?? 'HelaMap'} · 100% static, zero backend
-          </p>
-          {data?.address && <p>{data.address}</p>}
-          <p>
-            {[data?.contactEmail, data?.contactPhone].filter(Boolean).join(' · ')}
-          </p>
-        </div>
-      </footer>
+      <SiteFooter settings={data} />
     </div>
   );
 }

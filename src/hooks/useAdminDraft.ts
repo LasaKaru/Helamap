@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import type { MapData } from '../types';
 import { DRAFT_STORAGE_KEY } from '../config';
 import { assertMapData, fetchMapData, getSampleData } from '../lib/data';
+import { api, backendEnabled } from '../lib/api';
 import { downloadJson } from '../lib/utils';
 
 const LAST_EXPORT_KEY = 'helamap-last-export';
@@ -31,12 +32,16 @@ export interface AdminDraft {
   lastExport: string | null;
   /** Previous exports kept in this browser (newest first). */
   history: ExportVersion[];
+  /** True when Backend Mode is enabled in settings. */
+  backendMode: boolean;
   update: (updater: DraftUpdater) => void;
   exportData: () => MapData;
   importData: (json: unknown) => void;
   resetToSample: () => void;
   /** Load a previous export back into the draft. */
   restoreVersion: (version: ExportVersion) => void;
+  /** Backend Mode: PUT the draft to the API so it goes live immediately. */
+  publish: () => Promise<void>;
   /** Throw away the local draft and reload the live map-data.json. */
   discardDraft: () => Promise<void>;
 }
@@ -59,7 +64,7 @@ export function useAdminDraft(): AdminDraft {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      // Prefer an in-progress draft; fall back to the live file, then the sample.
+      // Prefer an in-progress draft; fall back to the live source, then sample.
       try {
         const raw = localStorage.getItem(DRAFT_STORAGE_KEY);
         if (raw) {
@@ -74,6 +79,20 @@ export function useAdminDraft(): AdminDraft {
         }
       } catch {
         localStorage.removeItem(DRAFT_STORAGE_KEY);
+      }
+      // Live source: API in Backend Mode, static JSON otherwise.
+      if (backendEnabled()) {
+        try {
+          const fromApi = await api.getMap();
+          assertMapData(fromApi);
+          if (!cancelled) {
+            setData(fromApi);
+            setLoading(false);
+          }
+          return;
+        } catch {
+          /* fall through to the static file */
+        }
       }
       try {
         const live = await fetchMapData();
@@ -162,6 +181,13 @@ export function useAdminDraft(): AdminDraft {
     [persist],
   );
 
+  const publish = useCallback(async () => {
+    if (!data) throw new Error('No data to publish');
+    await api.saveMap(data);
+    localStorage.removeItem(DRAFT_STORAGE_KEY);
+    setDirty(false);
+  }, [data]);
+
   const discardDraft = useCallback(async () => {
     localStorage.removeItem(DRAFT_STORAGE_KEY);
     setLoading(true);
@@ -181,11 +207,13 @@ export function useAdminDraft(): AdminDraft {
     dirty,
     lastExport,
     history,
+    backendMode: backendEnabled(),
     update,
     exportData,
     importData,
     resetToSample,
     restoreVersion,
+    publish,
     discardDraft,
   };
 }

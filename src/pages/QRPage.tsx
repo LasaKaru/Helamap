@@ -17,6 +17,7 @@ import SplashScreen from '../components/map/SplashScreen';
 import { buildDeepLink } from '../components/map/MapExperience';
 import { copyToClipboard } from '../lib/utils';
 import ThemeToggle from '../components/ui/ThemeToggle';
+import Seo from '../components/ui/Seo';
 
 /**
  * Pure-frontend QR generator for printable location codes.
@@ -61,6 +62,7 @@ export default function QRPage() {
 
   return (
     <div className="ambient-grid min-h-screen">
+      <Seo title="QR Codes" settings={data} />
       <header className="mx-auto flex max-w-3xl items-center justify-between px-5 py-5 no-print">
         <Link to="/" className="btn-ghost !px-3">
           <ArrowLeft className="h-4 w-4" /> Home

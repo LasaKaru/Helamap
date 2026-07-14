@@ -6,6 +6,7 @@ import { findZone, type ZoneRef } from '../../lib/data';
 import { formatDate } from '../../lib/utils';
 import { localizeZone, useI18n } from '../../lib/i18n';
 import { bumpViewCount, pushRecent } from '../../lib/prefs';
+import { api, backendEnabled } from '../../lib/api';
 import MapViewer from './MapViewer';
 import MapTopBar from './MapTopBar';
 import ZoneBottomSheet from './ZoneBottomSheet';
@@ -27,14 +28,15 @@ interface MapExperienceProps {
   embedded?: boolean;
 }
 
-/** Builds a shareable deep link that works from any static host (hash routing). */
+/** Builds a shareable deep link to the map with clean URLs. */
 export function buildDeepLink(loc: MapLocation): string {
   const params = new URLSearchParams();
   if (loc.buildingId) params.set('building', loc.buildingId);
   if (loc.floorId) params.set('floor', loc.floorId);
   if (loc.zoneId) params.set('zone', loc.zoneId);
   if (loc.hereZoneId) params.set('here', loc.hereZoneId);
-  return `${window.location.origin}${window.location.pathname}#/map?${params.toString()}`;
+  const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+  return `${window.location.origin}${base}/map?${params.toString()}`;
 }
 
 export default function MapExperience({
@@ -115,6 +117,8 @@ export default function MapExperience({
     else {
       pushRecent(id);
       bumpViewCount(id);
+      // Backend Mode: also feed the server-side analytics dashboard.
+      if (backendEnabled()) api.trackView(id);
     }
   };
   const pickSearchResult = (ref: ZoneRef) => {

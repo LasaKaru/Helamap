@@ -1,0 +1,42 @@
+FacilityFlow — Interactive Facility Map & Wayfinding CMS
+=========================================================
+
+Copyright (c) 2026. All rights reserved.
+
+This item is sold under the Envato Market License. By purchasing you agree to
+the Envato Market Terms and the license you selected at checkout:
+
+REGULAR LICENSE
+---------------
+- Use in a single end product for yourself or one client.
+- The end product may be used by you or the client (including their staff and
+  visitors) free of charge.
+- End users must NOT be charged for access to the end product.
+- You may modify the code and white-label the product.
+- You may not redistribute or resell the source code, in whole or part.
+
+EXTENDED LICENSE
+----------------
+- Use in a single end product where end users CAN be charged (e.g. paid
+  access, SaaS offering for one deployment).
+- All other Regular License terms apply.
+
+Full legal text: https://codecanyon.net/licenses/standard
+
+THIRD-PARTY SOFTWARE
+--------------------
+This product bundles open-source software under permissive licenses (MIT/ISC/
+Apache-2.0), including: React, React Router, Vite, TypeScript, Tailwind CSS,
+Framer Motion, react-zoom-pan-pinch, lucide-react, react-helmet-async, TipTap,
+qrcode, bcryptjs, Express, better-sqlite3, jsonwebtoken, helmet, cors,
+express-rate-limit, dotenv. Their licenses remain with their respective
+authors and are compatible with commercial use of this product.
+
+Demo content (sample facility, floor plans, placeholder imagery) is original
+to this product and may be reused within your end product.
+
+NO WARRANTY
+-----------
+The software is provided "as is", without warranty of any kind, express or
+implied. In no event shall the author be liable for any claim, damages or
+other liability arising from the use of the software.

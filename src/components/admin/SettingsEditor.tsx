@@ -1,8 +1,9 @@
-import { useRef } from 'react';
-import { ImagePlus, Trash2 } from 'lucide-react';
+import { useRef, useState } from 'react';
+import { CheckCircle2, ImagePlus, Server, Trash2, XCircle } from 'lucide-react';
 import type { AdminDraft } from '../../hooks/useAdminDraft';
 import type { AppSettings } from '../../types';
 import { fileToDataUrl } from '../../lib/utils';
+import { api, getBackendSettings, setBackendSettings } from '../../lib/api';
 import Logo from '../ui/Logo';
 
 const PRESET_COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#06B6D4', '#EC4899', '#64748B'];
@@ -100,6 +101,32 @@ export default function SettingsEditor({ draft }: { draft: AdminDraft }) {
           </div>
         </section>
 
+        {/* Dual Mode */}
+        <BackendModeCard />
+
+        {/* SEO & white-label */}
+        <section className="card p-5">
+          <h2 className="font-bold">SEO & white-label</h2>
+          <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            <Field label="SEO title (browser tab / share cards)" id="s-seotitle">
+              <input id="s-seotitle" className="input" value={data.seoTitle ?? ''}
+                onChange={(e) => set('seoTitle', e.target.value)}
+                placeholder={data.appName || 'FacilityFlow'} />
+            </Field>
+            <Field label="SEO description" id="s-seodesc">
+              <input id="s-seodesc" className="input" value={data.seoDescription ?? ''}
+                onChange={(e) => set('seoDescription', e.target.value)}
+                placeholder="Interactive facility wayfinding map…" />
+            </Field>
+          </div>
+          <label className="mt-4 flex cursor-pointer items-center gap-2.5 text-sm font-medium">
+            <input type="checkbox" checked={Boolean(data.whiteLabel)}
+              onChange={(e) => set('whiteLabel', e.target.checked)}
+              className="h-4 w-4 rounded accent-blue-600" />
+            White-label — hide the “Powered by FacilityFlow” footer credit
+          </label>
+        </section>
+
         {/* Contact */}
         <section className="card p-5">
           <h2 className="font-bold">Contact & location</h2>
@@ -143,6 +170,80 @@ export default function SettingsEditor({ draft }: { draft: AdminDraft }) {
         </div>
       </aside>
     </div>
+  );
+}
+
+/**
+ * Dual Mode switch. Static Mode (default) needs no server at all;
+ * Backend Mode points the whole app at the FacilityFlow REST API.
+ * Reloads the app on change so every data source re-resolves cleanly.
+ */
+function BackendModeCard() {
+  const [settings, setSettings] = useState(getBackendSettings());
+  const [testResult, setTestResult] = useState<'idle' | 'testing' | 'ok' | 'fail'>('idle');
+
+  const apply = (next: { enabled: boolean; url: string }) => {
+    setBackendSettings(next);
+    setSettings(next);
+  };
+
+  const test = async () => {
+    setTestResult('testing');
+    setBackendSettings(settings); // test against the URL in the input
+    setTestResult((await api.health()) ? 'ok' : 'fail');
+  };
+
+  return (
+    <section className="card border-blue-500/30 p-5">
+      <h2 className="flex items-center gap-2 font-bold">
+        <Server className="h-4 w-4 text-blue-500" /> Backend Mode (Pro)
+      </h2>
+      <p className="mt-1 text-xs leading-relaxed text-ink-500">
+        OFF = Static Mode: everything comes from <code>data/map-data.json</code>, no
+        server needed. ON = the app talks to the FacilityFlow API for live map data,
+        multi-user accounts, server analytics and instant publishing. If the API is
+        unreachable, the public map automatically falls back to the static file.
+      </p>
+
+      <label className="mt-4 flex cursor-pointer items-center gap-2.5 text-sm font-semibold">
+        <input
+          type="checkbox"
+          checked={settings.enabled}
+          onChange={(e) => {
+            apply({ ...settings, enabled: e.target.checked });
+            // Reload so hooks, admin auth and data sources re-resolve.
+            setTimeout(() => window.location.reload(), 150);
+          }}
+          className="h-4 w-4 rounded accent-blue-600"
+        />
+        Enable Backend Mode
+      </label>
+
+      <label className="label mt-4" htmlFor="s-apiurl">API base URL</label>
+      <div className="flex gap-2">
+        <input
+          id="s-apiurl"
+          className="input font-mono text-xs"
+          value={settings.url}
+          onChange={(e) => setSettings({ ...settings, url: e.target.value })}
+          onBlur={() => apply(settings)}
+          placeholder="http://localhost:4000"
+        />
+        <button type="button" className="btn-outline shrink-0" onClick={test}>
+          {testResult === 'testing' ? 'Testing…' : 'Test connection'}
+        </button>
+      </div>
+      {testResult === 'ok' && (
+        <p className="mt-2 flex items-center gap-1.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+          <CheckCircle2 className="h-3.5 w-3.5" /> Backend reachable — you're good to go.
+        </p>
+      )}
+      {testResult === 'fail' && (
+        <p className="mt-2 flex items-center gap-1.5 text-xs font-semibold text-red-500">
+          <XCircle className="h-3.5 w-3.5" /> No response. Is the server running? Check the URL and CORS_ORIGINS.
+        </p>
+      )}
+    </section>
   );
 }
 

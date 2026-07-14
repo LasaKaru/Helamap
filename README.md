@@ -1,220 +1,97 @@
-# HelaMap 🗺️
+# FacilityFlow 🗺️ — Interactive Facility Map & Wayfinding CMS
 
-**A mobile-first, interactive 2D facility wayfinding & onboarding map — 100% static, zero backend.**
+**Mobile-first interactive 2D wayfinding for factories, warehouses, hospitals,
+campuses and offices.** Visitors scan a QR code and instantly get a beautiful,
+pinch-zoomable facility map. Managers get a full CMS — with or without a backend.
 
-New hires scan a QR code at the entrance and instantly get a beautiful, pinch-zoomable
-floor plan of the whole facility in their mobile browser: tap any zone (Inventory,
-Bamburio Assembly, Quality Control, Canteen…) for descriptions, contacts, photos and
-safety notes, with an animated "You are here" route to wherever they need to go.
+> **Dual Mode:** run 100% static from one JSON file on any host, or flip a
+> switch in Settings for a Node + SQLite backend with multi-user accounts,
+> instant publishing and server analytics. If the API ever goes down, the map
+> gracefully falls back to the static file.
 
-Built with **React 18 + TypeScript + Vite**, **Tailwind CSS**, **Framer Motion**,
-**react-zoom-pan-pinch** and **lucide-react**. No database, no API, no server code —
-all content lives in a single static file: [`public/data/map-data.json`](public/data/map-data.json).
-
----
-
-## ✨ Features
-
-### Public map (`#/map`)
-- Buttery pinch-zoom / pan / double-tap zoom, tuned for phones
-- Tappable colored zone polygons over a pure-SVG floor plan (no map-tile libraries)
-- Bottom sheet with description, expandable details, safety warnings, photos,
-  **Get directions** (animated route from the scanned location) and **Share location** deep links
-- Building & floor switchers with smooth cross-fade; **stairs/elevator zones**
-  offer a one-tap jump to the connected floor (`connectsToFloorId`)
-- Live zone search with **#tag filters**, plus **favorites (star)** and
-  **recently viewed** — persisted on the device, surfaced in search and on the landing page
-- **Emergency mode**: a red siren button highlights every `isExit` zone and dims the rest
-- **English / සිංහල toggle** — UI strings are built in; per-zone translations
-  live in the JSON (`zone.translations.si`)
-- **Status badges** (`busy`, `low-stock`, `maintenance`, `closed`) as pulsing
-  dots on map labels and colored chips in the sheet
-- **Personal notes** per zone, stored only in the visitor's browser
-- Dark/light mode, "last updated" badge
-- Deep links: `#/map?building=b1&floor=f1&zone=z-inventory&here=z-entrance`
-  (`highlight=` works as an alias for `zone=`)
-
-### PWA / offline
-- Installable to the home screen (`manifest.webmanifest`)
-- Service worker caches the app shell, floor plans and photos **cache-first**,
-  and `map-data.json` **network-first with offline fallback** — after the first
-  visit the map works with no signal. Bump `CACHE_VERSION` in `public/sw.js`
-  to force-refresh clients.
-
-### Admin panel (`#/admin`, password-protected)
-- Dashboard with building/floor/zone counts and last export date
-- **Settings**: company name, app name, logo (upload or path), brand color, tagline,
-  welcome message, contact email/phone/address/website — all stored in the JSON
-- Full CRUD for buildings, floors (incl. map image upload with auto width/height) and zones
-- **Zone templates** (warehouse, office, production line, first aid, meeting
-  room, stairs) to start new zones with sensible defaults
-- Zone fields for **tags**, **status badge**, **emergency exit** flag and the
-  **stairs/elevator floor connector**
-- **Visual polygon editor**: click the floor plan to add points, drag to adjust,
-  auto-calculated center, live color preview, other zones shown as context
-- Live preview tab rendering the real public map from your draft
-- **Export map-data.json** (with confetti 🎉), **Import** a previous file,
-  **Reset to sample data**, **Discard draft**
-- **Version history**: the last 5 exports are kept in the browser and can be
-  re-downloaded (`map-data-v2.json`, …) or restored into the draft
-- **Most-viewed zones** insight on the dashboard (view counts recorded locally
-  on each device — no tracking, no server)
-- Drafts auto-save to `localStorage` — nothing is public until you export
-
-### QR generator (`#/qr`)
-- Pure-frontend QR codes (no external service) for any building/floor,
-  optionally pinned to a "You are here" zone
-- Printable poster layout, PNG download, copy-link
-- **QR gallery**: one "You are here" code for every zone, downloadable
-  individually or printed as a single sheet
+Default admin password (Static Mode): **facility2026** · Default backend login:
+**admin@facilityflow.local / ChangeMe123!** (change both before production).
 
 ---
 
-## 🚀 Run locally
+## Quick start
 
 ```bash
+# Static Mode (no server)
 npm install
-npm run dev        # http://localhost:5173
+npm run dev                 # http://localhost:5173
+
+# Full stack (frontend + API)
+npm --prefix server install
+npm run start:full          # web :5173 · api :4000
+
+# One-command production stack
+docker compose up --build   # web :8080 · api :4000
 ```
 
-Production build:
+## Feature highlights
 
-```bash
-npm run build      # outputs static site to dist/
-npm run preview    # serve the build locally
-```
+**Public experience** — SVG floor plans with buttery pinch-zoom; tappable zone
+polygons with glow; bottom sheets with details, photos, safety notes and
+animated directions; building/floor switching with stairs/elevator jumps;
+search with #tag filters; favorites & recents; emergency-exit mode;
+English/සිංහල toggle; status badges; personal notes; dark/light; installable
+PWA that works offline; deep links (`/map?building=b1&floor=f1&zone=z-inventory&here=z-entrance`,
+`highlight=` alias supported).
 
-**Admin password:** `facility2026` by default. Override at build time with a `.env` file:
+**Admin CMS** (`/admin`) — dashboard with stats & most-viewed zones; branding
+(logo, colors, SEO, white-label); full CRUD for buildings/floors/zones with a
+visual polygon editor and zone templates; TipTap rich-text editor for legal
+pages (Privacy, Terms, Cookies, About, Contact + form, Refunds, License);
+QR generator with per-zone gallery and print sheets; export/import, version
+history, reset to sample.
 
-```
-VITE_ADMIN_PASSWORD=your-password
-```
+**Backend Mode extras** — email/password sign-in (JWT + rotating refresh
+tokens, bcrypt); Super Admin / Facility Manager / Editor / Viewer roles;
+user management with activation & soft delete; **Publish now** (no file
+replacement); server version history; zone-view analytics; contact inbox;
+activity log; one-call backup & restore.
 
-> ⚠️ This is client-side protection only — it deters casual visitors, it is not real
-> security. Don't put secrets in the map data.
+**SEO** — dynamic meta/OG/Twitter tags, JSON-LD, generated `sitemap.xml`,
+`robots.txt`, clean URLs with SPA fallbacks for Netlify, Vercel, Apache, IIS,
+nginx and GitHub Pages.
 
----
+## Documentation
 
-## 🌍 Deploy (any static host)
-
-The app uses **hash routing** (`/#/map?...`), so deep links and QR codes work on every
-static host with **zero rewrite/redirect configuration**.
-
-| Host | How |
+| Guide | Contents |
 |---|---|
-| **Netlify** | Drag & drop the `dist/` folder onto app.netlify.com, or connect the repo (build: `npm run build`, publish dir: `dist`) |
-| **Vercel** | Import the repo — Vite is auto-detected (output `dist`) |
-| **GitHub Pages** | Set `base: '/<repo-name>/'` in `vite.config.ts`, build, publish `dist/` (e.g. with `gh-pages` or an Action) |
-| **Cloudflare Pages** | Connect repo, build `npm run build`, output `dist` |
-| **IIS / Apache / Nginx** | Copy the contents of `dist/` into any web folder. Done. |
+| [docs/INSTALLATION.md](docs/INSTALLATION.md) | Static, npm, Docker setups + first login |
+| [docs/DUAL-MODE.md](docs/DUAL-MODE.md) | How the mode switch & fallback work |
+| [docs/USER-ROLES.md](docs/USER-ROLES.md) | Role matrix + security details |
+| [docs/CUSTOMIZATION.md](docs/CUSTOMIZATION.md) | Branding, pages, maps, languages, passwords |
+| [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Netlify/Vercel/Pages/VPS/Railway/Render + checklist |
+| [docs/FAQ.md](docs/FAQ.md) | Common questions |
+| [docs/CODECANYON-LISTING.md](docs/CODECANYON-LISTING.md) | Sales-page kit, screenshots, video script |
+| [CHANGELOG.md](CHANGELOG.md) | Version history |
+| [LICENSE.txt](LICENSE.txt) | Envato Regular/Extended license terms |
 
----
-
-## 🔄 The admin workflow (edit → export → replace)
-
-1. Open `https://your-site/#/admin` and unlock with the password.
-2. Edit anything — company branding, buildings, floors, zones, polygons.
-   Every change is auto-saved as a **local browser draft** (visitors see nothing yet).
-3. Click **Export map-data.json**. A fresh file downloads.
-4. Replace `data/map-data.json` in the deployed site folder:
-   - Netlify/Vercel/Pages via git: overwrite `public/data/map-data.json`, commit, push.
-   - Netlify drag-drop / plain server (IIS, Apache): overwrite `data/map-data.json`
-     inside the published folder directly.
-5. The next QR scan loads the new data instantly (the app fetches it with cache-busting).
-
-Use **Import map-data.json** to reload a previously exported file, and
-**Reset to sample data** to restore the demo facility.
-
----
-
-## 🗺️ Adding a new floor plan
-
-1. Create the plan as an SVG or PNG (SVG recommended — crisp at any zoom).
-   Simple rectangles + a grid look great; see `public/maps/*.svg` for the style.
-2. Drop the file into `public/maps/` (deployed: the `maps/` folder next to `index.html`).
-3. In **Admin → Buildings & Zones**, add/edit a floor:
-   - set **Map image path** to `/maps/your-file.svg`
-   - set **Map width/height** to the image's pixel size (its SVG `viewBox` size)
-   - (or use **Upload image** — it embeds as base64 and auto-fills the size;
-     best kept under ~1.5 MB)
-4. Add zones and draw their polygons directly on the plan. Coordinates are in
-   map pixels relative to that width/height.
-
-Zone photos work the same way: put files in `public/photos/` and reference
-`/photos/name.jpg` in the zone's photo field.
-
----
-
-## 🔳 Generating & printing QR codes
-
-1. Open `https://your-site/#/qr`.
-2. Pick the building + floor, and optionally the zone where the poster will hang —
-   that becomes the **"You are here"** marker when scanned.
-3. **Download PNG** or **Print** the ready-made poster.
-4. Repeat per location: the entrance gets a plain floor link, the canteen door gets
-   `here=z-canteen`, etc.
-
-Any deep link can also be shared manually:
+## Project structure
 
 ```
-https://your-site/#/map?building=b1&floor=f1&zone=z-qc          → opens QC zone
-https://your-site/#/map?building=b1&floor=f1&here=z-entrance    → you-are-here at entrance
+public/          static assets · data/map-data.json · maps/ · SPA fallbacks · PWA
+src/             React app (pages/, components/{map,admin,ui}, hooks/, lib/)
+server/          Express + SQLite API (src/, seed-data/, Dockerfile, .env.example)
+docs/            buyer documentation
+deploy/          nginx.conf reference
+scripts/         sitemap generator
+docker-compose.yml · Dockerfile · ecosystem.config.cjs (PM2) · vercel.json
 ```
 
----
+## The static publishing workflow (no backend)
 
-## 📁 Project structure
+1. Edit anything in `/admin` — auto-saved as a browser draft.
+2. **Export map-data.json** (confetti included 🎉).
+3. Overwrite `data/map-data.json` on your host. The next scan shows the update.
 
-```
-public/
-  data/map-data.json        ← ALL content lives here (the only file admins touch)
-  maps/*.svg                ← floor plan images
-  photos/*.svg              ← zone photos
-src/
-  pages/                    LandingPage · MapPage · QRPage · AdminPage
-  components/
-    map/                    MapViewer · MapExperience · MapTopBar · ZoneBottomSheet · SplashScreen
-    admin/                  AdminDashboard · SettingsEditor · ContentEditor · ZoneEditor · PolygonEditor · ExportPanel · AdminLogin
-    ui/                     Logo · ThemeToggle
-  hooks/                    useMapData · useAdminDraft · useTheme
-  lib/                      data.ts · icons.tsx · utils.ts · confetti.ts
-  config.ts                 password / storage keys / data URL
-  types.ts                  MapData · Building · Floor · Zone · AppSettings
-```
+In Backend Mode this becomes a single **Publish now** click.
 
-### `map-data.json` shape (excerpt)
+## License
 
-```jsonc
-{
-  "appName": "HelaMap",
-  "companyName": "Your Company",
-  "logo": "/logos/company.png",        // or base64 data URL from admin upload
-  "primaryColor": "#3B82F6",
-  "lastUpdated": "2026-07-13T12:00:00Z",
-  "buildings": [{
-    "id": "b1", "name": "Main Production Hall", "description": "…",
-    "floors": [{
-      "id": "f1", "name": "Ground Floor", "level": 0,
-      "mapImage": "/maps/main-ground.svg", "mapWidth": 2000, "mapHeight": 1400,
-      "zones": [{
-        "id": "z-inventory", "name": "Main Inventory Section", "shortName": "Inventory",
-        "color": "#3B82F6", "icon": "package",
-        "description": "…", "details": "• line one\n• line two",
-        "safetyNotes": "…",
-        "polygon": [[100,300],[700,300],[700,900],[100,900]],   // map pixels
-        "center": [400,600],
-        "photo": "/photos/inventory.svg"
-      }]
-    }]
-  }]
-}
-```
-
----
-
-## 🌐 Roadmap-ready
-
-- Text content is centralized in the JSON, so multi-language support can be added by
-  swapping data files or extending the schema.
-- Branding (name, logo, colors, contact) is fully data-driven — the same codebase can
-  be re-skinned into a recruitment/onboarding site without code changes.
+Commercial product — Envato Market License (Regular or Extended). See
+[LICENSE.txt](LICENSE.txt). Bundled open-source dependencies remain under
+their own permissive licenses.

@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { Download, FileUp, History, RotateCcw, Undo2 } from 'lucide-react';
+import { CloudUpload, Download, FileUp, History, RotateCcw, Undo2 } from 'lucide-react';
 import type { AdminDraft } from '../../hooks/useAdminDraft';
 import { countStats } from '../../lib/data';
 import { fireConfetti } from '../../lib/confetti';
@@ -32,8 +32,36 @@ export default function ExportPanel({ draft }: { draft: AdminDraft }) {
     }
   };
 
+  const doPublish = async () => {
+    try {
+      await draft.publish();
+      fireConfetti();
+      setMessage({ kind: 'ok', text: 'Published! The live map now serves this version from the backend.' });
+    } catch (e) {
+      setMessage({ kind: 'err', text: `Publish failed: ${(e as Error).message}` });
+    }
+  };
+
   return (
     <div className="mx-auto max-w-2xl space-y-6">
+      {/* Backend Mode: publish straight to the API */}
+      {draft.backendMode && (
+        <section className="card border-emerald-500/30 p-6 text-center">
+          <h1 className="text-lg font-bold">Publish to server</h1>
+          <p className="mx-auto mt-1.5 max-w-md text-sm text-ink-500">
+            Backend Mode is ON — publishing saves the draft to the database and the
+            public map updates instantly. No file replacement needed.
+          </p>
+          <button type="button" onClick={doPublish} className="btn-success mt-5 !px-8 !py-3.5 !text-base">
+            <CloudUpload className="h-5 w-5" />
+            Publish now
+          </button>
+          <p className="mt-3 text-xs text-ink-400">
+            The server keeps its own version history (last 20 saves).
+          </p>
+        </section>
+      )}
+
       {/* Export */}
       <section className="card p-6 text-center">
         <h1 className="text-lg font-bold">Save & Export</h1>

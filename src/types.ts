@@ -60,6 +60,14 @@ export interface Building {
   floors: Floor[];
 }
 
+/** Editable legal/company page (Privacy Policy, Terms, About…). */
+export interface PageContent {
+  slug: string;
+  title: string;
+  html: string;
+  updatedAt?: string;
+}
+
 /** Branding & company info — fully editable from the admin Settings tab. */
 export interface AppSettings {
   appName: string;
@@ -73,10 +81,17 @@ export interface AppSettings {
   address?: string;
   website?: string;
   welcomeMessage?: string;
+  /** White-label: hide the "Powered by FacilityFlow" credit. */
+  whiteLabel?: boolean;
+  /** SEO defaults used by every page unless overridden. */
+  seoTitle?: string;
+  seoDescription?: string;
 }
 
 export interface MapData extends AppSettings {
   version: string;
   lastUpdated: string;
   buildings: Building[];
+  /** Legal/company pages (Static Mode storage; Backend Mode uses the DB). */
+  pages?: PageContent[];
 }

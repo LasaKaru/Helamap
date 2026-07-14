@@ -4,38 +4,51 @@ import {
   Building2,
   Eye,
   FileJson,
+  FileText,
   LayoutDashboard,
   LogOut,
   Settings,
+  Users,
 } from 'lucide-react';
 import { ADMIN_SESSION_KEY } from '../config';
 import { useAdminDraft } from '../hooks/useAdminDraft';
+import { api, backendEnabled, currentUser } from '../lib/api';
 import { cn } from '../lib/utils';
 import AdminLogin from '../components/admin/AdminLogin';
 import AdminDashboard from '../components/admin/AdminDashboard';
 import SettingsEditor from '../components/admin/SettingsEditor';
 import ContentEditor from '../components/admin/ContentEditor';
 import ExportPanel from '../components/admin/ExportPanel';
+import UsersManager from '../components/admin/UsersManager';
+import PagesEditor from '../components/admin/PagesEditor';
 import MapExperience from '../components/map/MapExperience';
 import ThemeToggle from '../components/ui/ThemeToggle';
 import Logo from '../components/ui/Logo';
 
-type Tab = 'dashboard' | 'settings' | 'content' | 'preview' | 'export';
-
-const TABS: { id: Tab; label: string; icon: React.ReactNode }[] = [
-  { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard className="h-4 w-4" /> },
-  { id: 'settings', label: 'Settings', icon: <Settings className="h-4 w-4" /> },
-  { id: 'content', label: 'Buildings & Zones', icon: <Building2 className="h-4 w-4" /> },
-  { id: 'preview', label: 'Live Preview', icon: <Eye className="h-4 w-4" /> },
-  { id: 'export', label: 'Export / Import', icon: <FileJson className="h-4 w-4" /> },
-];
+type Tab = 'dashboard' | 'settings' | 'content' | 'pages' | 'users' | 'preview' | 'export';
 
 export default function AdminPage() {
   const [unlocked, setUnlocked] = useState(
-    () => sessionStorage.getItem(ADMIN_SESSION_KEY) === '1',
+    () => sessionStorage.getItem(ADMIN_SESSION_KEY) === '1' || api.isAuthenticated(),
   );
   const [tab, setTab] = useState<Tab>('dashboard');
   const draft = useAdminDraft();
+
+  const user = currentUser();
+  const canManageUsers =
+    draft.backendMode && (user?.role === 'super_admin' || user?.role === 'facility_manager');
+
+  const tabs: { id: Tab; label: string; icon: React.ReactNode }[] = [
+    { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard className="h-4 w-4" /> },
+    { id: 'settings', label: 'Settings', icon: <Settings className="h-4 w-4" /> },
+    { id: 'content', label: 'Buildings & Zones', icon: <Building2 className="h-4 w-4" /> },
+    { id: 'pages', label: 'Pages', icon: <FileText className="h-4 w-4" /> },
+    ...(canManageUsers
+      ? [{ id: 'users' as Tab, label: 'Users', icon: <Users className="h-4 w-4" /> }]
+      : []),
+    { id: 'preview', label: 'Live Preview', icon: <Eye className="h-4 w-4" /> },
+    { id: 'export', label: draft.backendMode ? 'Publish / Export' : 'Export / Import', icon: <FileJson className="h-4 w-4" /> },
+  ];
 
   if (!unlocked) {
     return (
@@ -63,7 +76,11 @@ export default function AdminPage() {
                 </span>
               </p>
               <p className="text-[11px] leading-tight text-ink-400">
-                {draft.dirty ? 'Unsaved draft (auto-saved locally)' : 'In sync with loaded data'}
+                {draft.backendMode
+                  ? `Backend Mode${user ? ` · ${user.name} (${user.role.replace('_', ' ')})` : ''}`
+                  : draft.dirty
+                    ? 'Static Mode · unsaved draft (auto-saved locally)'
+                    : 'Static Mode · in sync with loaded data'}
               </p>
             </div>
           </Link>
@@ -72,8 +89,9 @@ export default function AdminPage() {
           <button
             type="button"
             className="btn-ghost !px-3"
-            onClick={() => {
+            onClick={async () => {
               sessionStorage.removeItem(ADMIN_SESSION_KEY);
+              if (backendEnabled()) await api.logout();
               setUnlocked(false);
             }}
           >
@@ -87,7 +105,7 @@ export default function AdminPage() {
           className="mx-auto flex max-w-6xl gap-1 overflow-x-auto px-4 pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           aria-label="Admin sections"
         >
-          {TABS.map((t) => (
+          {tabs.map((t) => (
             <button
               key={t.id}
               type="button"
@@ -122,6 +140,8 @@ export default function AdminPage() {
             )}
             {tab === 'settings' && <SettingsEditor draft={draft} />}
             {tab === 'content' && <ContentEditor draft={draft} />}
+            {tab === 'pages' && <PagesEditor draft={draft} />}
+            {tab === 'users' && canManageUsers && <UsersManager />}
             {tab === 'preview' && (
               <div className="overflow-hidden rounded-2xl border border-ink-100 dark:border-ink-800 h-[calc(100vh-14rem)] min-h-[480px]">
                 <MapExperience key={JSON.stringify(draft.data.lastUpdated)} data={draft.data} embedded />
