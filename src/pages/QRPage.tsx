@@ -2,8 +2,17 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import QRCode from 'qrcode';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Check, Download, Link2, Printer, QrCode } from 'lucide-react';
+import {
+  ArrowLeft,
+  Check,
+  Download,
+  Grid3x3,
+  Link2,
+  Printer,
+  QrCode,
+} from 'lucide-react';
 import { useMapData } from '../hooks/useMapData';
+import { allZones } from '../lib/data';
 import SplashScreen from '../components/map/SplashScreen';
 import { buildDeepLink } from '../components/map/MapExperience';
 import { copyToClipboard } from '../lib/utils';
@@ -181,7 +190,135 @@ export default function QRPage() {
             Point your phone camera at the code — no app needed.
           </p>
         </motion.div>
+
+        {/* Gallery: one QR per zone, ready to print in bulk */}
+        <QRGallery data={data} />
       </main>
     </div>
   );
+}
+
+interface GalleryItem {
+  zoneId: string;
+  zoneName: string;
+  place: string;
+  qr: string;
+}
+
+function QRGallery({ data }: { data: NonNullable<ReturnType<typeof useMapData>['data']> }) {
+  const [items, setItems] = useState<GalleryItem[]>([]);
+
+  const refs = useMemo(() => allZones(data), [data]);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const out: GalleryItem[] = [];
+      for (const r of refs) {
+        const url = buildDeepLink({
+          buildingId: r.building.id,
+          floorId: r.floor.id,
+          hereZoneId: r.zone.id,
+          zoneId: null,
+        });
+        try {
+          const qr = await QRCode.toDataURL(url, {
+            width: 360,
+            margin: 2,
+            errorCorrectionLevel: 'M',
+            color: { dark: '#0e131d', light: '#ffffff' },
+          });
+          out.push({
+            zoneId: r.zone.id,
+            zoneName: r.zone.name,
+            place: `${r.building.name} · ${r.floor.name}`,
+            qr,
+          });
+        } catch {
+          /* skip zones whose URL fails to encode */
+        }
+      }
+      if (!cancelled) setItems(out);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [refs]);
+
+  const printGallery = () => {
+    const w = window.open('', '_blank');
+    if (!w) return;
+    w.document.write(`<!doctype html><html><head><title>QR gallery — ${data.appName}</title>
+      <style>
+        body { font-family: system-ui, sans-serif; margin: 24px; }
+        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
+        .card { border: 1.5px solid #cbd5e1; border-radius: 16px; padding: 20px; text-align: center; break-inside: avoid; }
+        img { width: 70%; max-width: 260px; }
+        h2 { font-size: 15px; margin: 10px 0 2px; }
+        p { font-size: 12px; color: #64748b; margin: 2px 0; }
+        .hint { font-size: 11px; margin-top: 8px; }
+      </style></head><body>
+      <div class="grid">${items
+        .map(
+          (it) => `<div class="card">
+            <img src="${it.qr}" alt="" />
+            <h2>${escapeHtml(it.zoneName)}</h2>
+            <p>${escapeHtml(it.place)}</p>
+            <p class="hint">Scan to open the facility map — you are here.</p>
+          </div>`,
+        )
+        .join('')}</div>
+      <script>window.onload = () => setTimeout(() => window.print(), 300);</script>
+      </body></html>`);
+    w.document.close();
+  };
+
+  return (
+    <section className="card p-5 no-print sm:col-span-2">
+      <div className="flex flex-wrap items-center gap-3">
+        <h2 className="flex items-center gap-2 font-bold">
+          <Grid3x3 className="h-4 w-4" /> QR gallery — every zone
+        </h2>
+        <div className="flex-1" />
+        <button
+          type="button"
+          className="btn-primary !py-2 !text-xs"
+          disabled={items.length === 0}
+          onClick={printGallery}
+        >
+          <Printer className="h-3.5 w-3.5" /> Print all ({items.length})
+        </button>
+      </div>
+      <p className="mt-1 text-xs text-ink-500">
+        One “You are here” code per zone — print the sheet and post each code at its zone.
+      </p>
+      <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-6">
+        {items.length === 0 &&
+          Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="skeleton aspect-square" />
+          ))}
+        {items.map((it) => (
+          <a
+            key={it.zoneId}
+            href={it.qr}
+            download={`qr-${it.zoneId}.png`}
+            className="group rounded-xl border border-ink-100 dark:border-ink-800 p-2 text-center transition-colors hover:border-blue-400"
+            title={`Download QR for ${it.zoneName}`}
+          >
+            <img src={it.qr} alt={`QR code for ${it.zoneName}`} className="w-full rounded-lg" />
+            <p className="mt-1.5 truncate text-[11px] font-semibold">{it.zoneName}</p>
+            <p className="truncate text-[10px] text-ink-400">{it.place}</p>
+          </a>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function escapeHtml(s: string): string {
+  return s
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;');
 }

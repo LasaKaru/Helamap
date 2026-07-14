@@ -1,7 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Siren } from 'lucide-react';
 import type { MapData } from '../../types';
 import { findZone, type ZoneRef } from '../../lib/data';
 import { formatDate } from '../../lib/utils';
+import { localizeZone, useI18n } from '../../lib/i18n';
+import { bumpViewCount, pushRecent } from '../../lib/prefs';
 import MapViewer from './MapViewer';
 import MapTopBar from './MapTopBar';
 import ZoneBottomSheet from './ZoneBottomSheet';
@@ -64,14 +68,28 @@ export default function MapExperience({
 
   const [{ buildingId, floorId, zoneId }, setLoc] = useState(resolveInitial);
   const [showDirections, setShowDirections] = useState(false);
+  const [emergency, setEmergency] = useState(false);
+  const { lang, t } = useI18n();
 
   const hereZoneId = initial?.hereZoneId ?? null;
 
   const building = data.buildings.find((b) => b.id === buildingId) ?? firstBuilding;
-  const floor = building?.floors.find((f) => f.id === floorId) ?? building?.floors[0];
+  const rawFloor = building?.floors.find((f) => f.id === floorId) ?? building?.floors[0];
+  // Localize zone text for the active language before anything renders it.
+  const floor = useMemo(
+    () =>
+      rawFloor
+        ? { ...rawFloor, zones: rawFloor.zones.map((z) => localizeZone(z, lang)) }
+        : rawFloor,
+    [rawFloor, lang],
+  );
   const zone = zoneId ? floor?.zones.find((z) => z.id === zoneId) ?? null : null;
   const hereRef = hereZoneId ? findZone(data, hereZoneId) : undefined;
   const hereOnThisFloor = hereRef?.floor.id === floor?.id ? hereRef.zone.id : null;
+
+  const connectedFloor = zone?.connectsToFloorId
+    ? building?.floors.find((f) => f.id === zone.connectsToFloorId) ?? null
+    : null;
 
   useEffect(() => {
     onLocationChange?.({
@@ -94,6 +112,10 @@ export default function MapExperience({
   const selectZone = (id: string | null) => {
     setLoc((s) => ({ ...s, zoneId: id }));
     if (!id) setShowDirections(false);
+    else {
+      pushRecent(id);
+      bumpViewCount(id);
+    }
   };
   const pickSearchResult = (ref: ZoneRef) => {
     setLoc({ buildingId: ref.building.id, floorId: ref.floor.id, zoneId: ref.zone.id });
@@ -131,16 +153,49 @@ export default function MapExperience({
         onSelectZone={selectZone}
         hereZoneId={hereOnThisFloor}
         showDirections={showDirections}
+        emergencyMode={emergency}
       />
 
-      {/* Last updated badge */}
-      {!embedded && (
-        <div className="pointer-events-none absolute bottom-3 left-3 z-10 no-print">
-          <span className="glass rounded-full px-3 py-1.5 text-[11px] font-medium text-ink-500 dark:text-ink-400">
-            Updated {formatDate(data.lastUpdated)}
+      {/* Emergency mode banner */}
+      <AnimatePresence>
+        {emergency && (
+          <motion.div
+            initial={{ opacity: 0, y: -12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -12 }}
+            className="pointer-events-none absolute inset-x-0 top-32 z-20 flex justify-center px-4 no-print"
+          >
+            <span className="rounded-full bg-red-600 px-4 py-2 text-xs font-bold text-white shadow-glass">
+              {t.emergencyOn}
+            </span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Emergency toggle + last updated badge */}
+      <div className="absolute bottom-3 left-3 z-10 flex items-center gap-2 no-print">
+        <button
+          type="button"
+          onClick={() => {
+            setEmergency((v) => !v);
+            selectZone(null);
+          }}
+          aria-pressed={emergency}
+          aria-label={t.emergency}
+          className={`flex h-11 w-11 items-center justify-center rounded-full shadow-glass transition-all active:scale-90 ${
+            emergency
+              ? 'bg-red-600 text-white'
+              : 'glass text-red-500'
+          }`}
+        >
+          <Siren className="h-5 w-5" />
+        </button>
+        {!embedded && (
+          <span className="glass pointer-events-none rounded-full px-3 py-1.5 text-[11px] font-medium text-ink-500 dark:text-ink-400">
+            {t.updated} {formatDate(data.lastUpdated)}
           </span>
-        </div>
-      )}
+        )}
+      </div>
 
       <ZoneBottomSheet
         zone={zone ?? null}
@@ -149,6 +204,8 @@ export default function MapExperience({
         canShowDirections={Boolean(hereOnThisFloor && zone && hereOnThisFloor !== zone.id)}
         directionsActive={showDirections}
         onToggleDirections={() => setShowDirections((v) => !v)}
+        connectedFloorName={connectedFloor?.name ?? null}
+        onGoToFloor={connectedFloor ? () => selectFloor(connectedFloor.id) : undefined}
       />
     </div>
   );

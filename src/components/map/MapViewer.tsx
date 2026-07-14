@@ -15,6 +15,7 @@ import { motion } from 'framer-motion';
 import { Locate, Maximize, Minus, Plus } from 'lucide-react';
 import type { Floor, Zone } from '../../types';
 import { assetUrl, pointsToSvg } from '../../lib/utils';
+import { STATUS_COLORS, useI18n } from '../../lib/i18n';
 
 interface MapViewerProps {
   floor: Floor;
@@ -24,6 +25,8 @@ interface MapViewerProps {
   hereZoneId?: string | null;
   /** Draw an animated route from `here` to the selected zone. */
   showDirections?: boolean;
+  /** Emergency mode: exits pulse red, everything else is dimmed. */
+  emergencyMode?: boolean;
   /** Hide the floating controls (used inside the admin polygon editor preview). */
   hideControls?: boolean;
 }
@@ -40,8 +43,10 @@ export default function MapViewer({
   onSelectZone,
   hereZoneId,
   showDirections,
+  emergencyMode,
   hideControls,
 }: MapViewerProps) {
+  const { t } = useI18n();
   const containerRef = useRef<HTMLDivElement>(null);
   const wrapperRef = useRef<ReactZoomPanPinchRef>(null);
   const [container, setContainer] = useState<{ w: number; h: number } | null>(null);
@@ -120,6 +125,13 @@ export default function MapViewer({
   return (
     <div ref={containerRef} className="relative h-full w-full overflow-hidden touch-none">
       {container && (
+        <motion.div
+          key={floor.id}
+          initial={{ opacity: 0, scale: 0.985 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.35, ease: 'easeOut' }}
+          className="h-full w-full"
+        >
         <TransformWrapper
           key={`${floor.id}-${fitScale.toFixed(4)}`}
           ref={wrapperRef}
@@ -158,6 +170,7 @@ export default function MapViewer({
                   key={zone.id}
                   zone={zone}
                   selected={zone.id === selectedZoneId}
+                  emergencyMode={emergencyMode}
                   onSelect={() => onSelectZone(zone.id)}
                 />
               ))}
@@ -195,6 +208,8 @@ export default function MapViewer({
                   zone={zone}
                   inverseScale={labelScale}
                   selected={zone.id === selectedZoneId}
+                  emergencyMode={emergencyMode}
+                  exitLabel={t.exit}
                   onSelect={() => onSelectZone(zone.id)}
                 />
               ))}
@@ -223,13 +238,14 @@ export default function MapViewer({
                     strokeWidth={4}
                     paintOrder="stroke"
                   >
-                    You are here
+                    {t.youAreHere}
                   </text>
                 </g>
               )}
             </svg>
           </TransformComponent>
         </TransformWrapper>
+        </motion.div>
       )}
 
       {!hideControls && (
@@ -279,29 +295,48 @@ function MapButton({
 function ZonePolygon({
   zone,
   selected,
+  emergencyMode,
   onSelect,
 }: {
   zone: Zone;
   selected: boolean;
+  emergencyMode?: boolean;
   onSelect: () => void;
 }) {
   const downPos = useRef<{ x: number; y: number } | null>(null);
   if (zone.polygon.length < 3) return null;
+
+  const isExit = Boolean(zone.isExit);
+  const color = emergencyMode && isExit ? '#EF4444' : zone.color;
+  const fillAnim =
+    emergencyMode
+      ? isExit
+        ? { fillOpacity: [0.35, 0.6, 0.35] }
+        : { fillOpacity: 0.06 }
+      : { fillOpacity: selected ? 0.45 : zone.isHighlighted ? 0.38 : 0.22 };
+
   return (
     <motion.polygon
       points={pointsToSvg(zone.polygon)}
-      fill={zone.color}
-      stroke={zone.color}
-      strokeWidth={selected ? 3.5 : 2}
+      fill={color}
+      stroke={color}
+      strokeWidth={selected || (emergencyMode && isExit) ? 3.5 : 2}
       strokeLinejoin="round"
       vectorEffect="non-scaling-stroke"
       initial={false}
-      animate={{ fillOpacity: selected ? 0.45 : zone.isHighlighted ? 0.38 : 0.22 }}
-      whileHover={{ fillOpacity: 0.4 }}
-      transition={{ duration: 0.25 }}
+      animate={fillAnim}
+      whileHover={emergencyMode ? undefined : { fillOpacity: 0.4 }}
+      transition={
+        emergencyMode && isExit
+          ? { duration: 1.4, repeat: Infinity, ease: 'easeInOut' }
+          : { duration: 0.25 }
+      }
       style={{
         cursor: 'pointer',
-        filter: selected ? `drop-shadow(0 0 14px ${zone.color})` : undefined,
+        filter:
+          selected || (emergencyMode && isExit)
+            ? `drop-shadow(0 0 14px ${color})`
+            : undefined,
       }}
       role="button"
       aria-label={`Zone: ${zone.name}`}
@@ -327,19 +362,29 @@ function ZoneLabel({
   zone,
   inverseScale,
   selected,
+  emergencyMode,
+  exitLabel,
   onSelect,
 }: {
   zone: Zone;
   inverseScale: number;
   selected: boolean;
+  emergencyMode?: boolean;
+  exitLabel: string;
   onSelect: () => void;
 }) {
   const [cx, cy] = zone.center;
-  const width = zone.shortName.length * 8.2 + 30;
+  const isExit = Boolean(zone.isExit);
+  const text = emergencyMode && isExit ? `⬆ ${exitLabel}` : zone.shortName;
+  const accent = emergencyMode && isExit ? '#EF4444' : zone.color;
+  const statusColor = zone.status ? STATUS_COLORS[zone.status] : null;
+  const width = text.length * 8.2 + 30 + (statusColor ? 14 : 0);
+  const dimmed = emergencyMode && !isExit;
   return (
     <g
       transform={`translate(${cx}, ${cy}) scale(${inverseScale})`}
       style={{ cursor: 'pointer' }}
+      opacity={dimmed ? 0.25 : 1}
       onClick={(e) => {
         e.stopPropagation();
         onSelect();
@@ -354,21 +399,31 @@ function ZoneLabel({
         rx={15}
         className="fill-white dark:fill-ink-900"
         fillOpacity={selected ? 1 : 0.92}
-        stroke={zone.color}
-        strokeOpacity={selected ? 1 : 0.55}
-        strokeWidth={selected ? 2.5 : 1.5}
+        stroke={accent}
+        strokeOpacity={selected || (emergencyMode && isExit) ? 1 : 0.55}
+        strokeWidth={selected || (emergencyMode && isExit) ? 2.5 : 1.5}
       />
-      <circle cx={-width / 2 + 15} cy={0} r={5} fill={zone.color} />
+      <circle cx={-width / 2 + 15} cy={0} r={5} fill={accent} />
       <text
-        x={8}
+        x={statusColor ? 1 : 8}
         y={5}
         textAnchor="middle"
         fontSize={13.5}
         fontWeight={650}
         className="fill-ink-800 dark:fill-ink-100"
       >
-        {zone.shortName}
+        {text}
       </text>
+      {statusColor && (
+        <circle cx={width / 2 - 13} cy={0} r={5} fill={statusColor}>
+          <animate
+            attributeName="opacity"
+            values="1;0.35;1"
+            dur="1.6s"
+            repeatCount="indefinite"
+          />
+        </circle>
+      )}
     </g>
   );
 }

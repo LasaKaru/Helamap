@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import {
   ArrowRight,
+  BarChart3,
   Building2,
   Clock,
   FileJson,
@@ -10,7 +11,9 @@ import {
   Settings,
 } from 'lucide-react';
 import type { AdminDraft } from '../../hooks/useAdminDraft';
-import { countStats } from '../../lib/data';
+import { allZones, countStats } from '../../lib/data';
+import { getViewCounts } from '../../lib/prefs';
+import { ZoneIcon } from '../../lib/icons';
 import { formatDate } from '../../lib/utils';
 
 export default function AdminDashboard({
@@ -96,6 +99,8 @@ export default function AdminDashboard({
         />
       </div>
 
+      <MostViewed draft={draft} />
+
       {/* Workflow reminder */}
       <div className="card p-5">
         <h2 className="text-sm font-bold">How publishing works</h2>
@@ -105,6 +110,49 @@ export default function AdminDashboard({
           <li><b className="text-ink-700 dark:text-ink-200">3. Replace</b> — overwrite <code className="rounded bg-ink-100 dark:bg-ink-800 px-1.5 py-0.5 text-xs">/data/map-data.json</code> on your static host. The next QR scan shows the update instantly.</li>
         </ol>
       </div>
+    </div>
+  );
+}
+
+/** Zone views recorded on this device only — a light usage insight. */
+function MostViewed({ draft }: { draft: AdminDraft }) {
+  const counts = getViewCounts();
+  const rows = allZones(draft.data!)
+    .map((r) => ({ r, n: counts[r.zone.id] ?? 0 }))
+    .filter((x) => x.n > 0)
+    .sort((a, b) => b.n - a.n)
+    .slice(0, 5);
+  if (rows.length === 0) return null;
+  const max = rows[0].n;
+
+  return (
+    <div className="card p-5">
+      <h2 className="flex items-center gap-2 text-sm font-bold">
+        <BarChart3 className="h-4 w-4" /> Most viewed zones
+        <span className="rounded-md bg-ink-100 dark:bg-ink-800 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-ink-400">
+          this browser only
+        </span>
+      </h2>
+      <ul className="mt-4 space-y-2.5">
+        {rows.map(({ r, n }) => (
+          <li key={r.zone.id} className="flex items-center gap-3">
+            <span
+              className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-white"
+              style={{ backgroundColor: r.zone.color }}
+            >
+              <ZoneIcon name={r.zone.icon} className="h-3.5 w-3.5" />
+            </span>
+            <span className="w-40 truncate text-xs font-semibold">{r.zone.name}</span>
+            <span className="h-2 flex-1 overflow-hidden rounded-full bg-ink-100 dark:bg-ink-800">
+              <span
+                className="block h-full rounded-full"
+                style={{ width: `${(n / max) * 100}%`, backgroundColor: r.zone.color }}
+              />
+            </span>
+            <span className="w-8 text-right text-xs font-bold text-ink-500">{n}</span>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

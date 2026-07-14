@@ -19,7 +19,8 @@ export default function MapPage() {
     initialRef.current = {
       buildingId: searchParams.get('building'),
       floorId: searchParams.get('floor'),
-      zoneId: searchParams.get('zone'),
+      // `highlight` is a friendly alias for `zone` on printed QR materials.
+      zoneId: searchParams.get('zone') ?? searchParams.get('highlight'),
       hereZoneId: searchParams.get('here'),
     };
   }

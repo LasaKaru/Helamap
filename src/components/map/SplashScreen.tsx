@@ -1,8 +1,10 @@
 import { motion } from 'framer-motion';
 import { MapPin } from 'lucide-react';
+import { useI18n } from '../../lib/i18n';
 
 /** Full-screen hero loading animation shown while map data streams in. */
 export default function SplashScreen({ error }: { error?: string | null }) {
+  const { t } = useI18n();
   return (
     <div className="ambient-grid fixed inset-0 z-50 flex flex-col items-center justify-center bg-ink-50 dark:bg-ink-950">
       <motion.div
@@ -23,7 +25,7 @@ export default function SplashScreen({ error }: { error?: string | null }) {
         transition={{ delay: 0.25 }}
         className="mt-8 text-sm font-semibold tracking-wide text-ink-500 dark:text-ink-400"
       >
-        {error ? 'Something went wrong' : 'Loading facility map…'}
+        {error ? 'Something went wrong' : t.loading}
       </motion.p>
 
       {error ? (

@@ -1,0 +1,25 @@
+{
+  "name": "HelaMap · Facility Wayfinding",
+  "short_name": "HelaMap",
+  "description": "Interactive facility wayfinding & onboarding map. Scan, explore, find your way.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0e131d",
+  "theme_color": "#0e131d",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-maskable.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}

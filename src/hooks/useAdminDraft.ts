@@ -5,6 +5,21 @@ import { assertMapData, fetchMapData, getSampleData } from '../lib/data';
 import { downloadJson } from '../lib/utils';
 
 const LAST_EXPORT_KEY = 'helamap-last-export';
+const HISTORY_KEY = 'helamap-export-history';
+const HISTORY_LIMIT = 5;
+
+export interface ExportVersion {
+  ts: string;
+  data: MapData;
+}
+
+function readHistory(): ExportVersion[] {
+  try {
+    return JSON.parse(localStorage.getItem(HISTORY_KEY) ?? '[]') as ExportVersion[];
+  } catch {
+    return [];
+  }
+}
 
 export type DraftUpdater = MapData | ((prev: MapData) => MapData);
 
@@ -14,10 +29,14 @@ export interface AdminDraft {
   /** True when the draft differs from what was last loaded/exported. */
   dirty: boolean;
   lastExport: string | null;
+  /** Previous exports kept in this browser (newest first). */
+  history: ExportVersion[];
   update: (updater: DraftUpdater) => void;
   exportData: () => MapData;
   importData: (json: unknown) => void;
   resetToSample: () => void;
+  /** Load a previous export back into the draft. */
+  restoreVersion: (version: ExportVersion) => void;
   /** Throw away the local draft and reload the live map-data.json. */
   discardDraft: () => Promise<void>;
 }
@@ -34,6 +53,7 @@ export function useAdminDraft(): AdminDraft {
   const [lastExport, setLastExport] = useState<string | null>(() =>
     localStorage.getItem(LAST_EXPORT_KEY),
   );
+  const [history, setHistory] = useState<ExportVersion[]>(readHistory);
   const saveTimer = useRef<number>();
 
   useEffect(() => {
@@ -94,13 +114,25 @@ export function useAdminDraft(): AdminDraft {
 
   const exportData = useCallback((): MapData => {
     if (!data) throw new Error('No data to export');
-    const out: MapData = { ...data, lastUpdated: new Date().toISOString() };
-    downloadJson(out, 'map-data.json');
     const now = new Date().toISOString();
+    const out: MapData = { ...data, lastUpdated: now };
+    downloadJson(out, 'map-data.json');
     localStorage.setItem(LAST_EXPORT_KEY, now);
     setLastExport(now);
     setData(out);
     persist(out);
+    // Keep a rolling version history in this browser (skip if the payload is
+    // huge, e.g. many embedded base64 images, to protect the storage quota).
+    const serialized = JSON.stringify(out);
+    if (serialized.length < 900_000) {
+      const next = [{ ts: now, data: out }, ...readHistory()].slice(0, HISTORY_LIMIT);
+      try {
+        localStorage.setItem(HISTORY_KEY, JSON.stringify(next));
+        setHistory(next);
+      } catch {
+        /* quota — history is a convenience, not a requirement */
+      }
+    }
     return out;
   }, [data, persist]);
 
@@ -121,6 +153,15 @@ export function useAdminDraft(): AdminDraft {
     persist(sample);
   }, [persist]);
 
+  const restoreVersion = useCallback(
+    (version: ExportVersion) => {
+      setData(version.data);
+      setDirty(true);
+      persist(version.data);
+    },
+    [persist],
+  );
+
   const discardDraft = useCallback(async () => {
     localStorage.removeItem(DRAFT_STORAGE_KEY);
     setLoading(true);
@@ -139,10 +180,12 @@ export function useAdminDraft(): AdminDraft {
     loading,
     dirty,
     lastExport,
+    history,
     update,
     exportData,
     importData,
     resetToSample,
+    restoreVersion,
     discardDraft,
   };
 }

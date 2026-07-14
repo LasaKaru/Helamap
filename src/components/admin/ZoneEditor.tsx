@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Check, X } from 'lucide-react';
-import type { Floor, Zone } from '../../types';
+import { Check, Sparkles, X } from 'lucide-react';
+import type { Floor, Zone, ZoneStatus } from '../../types';
 import { ZONE_ICON_NAMES, ZoneIcon } from '../../lib/icons';
 import { cn } from '../../lib/utils';
 import PolygonEditor from './PolygonEditor';
@@ -12,8 +12,66 @@ const ZONE_COLORS = [
   '#F97316', '#64748B',
 ];
 
+const STATUS_OPTIONS: { value: '' | ZoneStatus; label: string }[] = [
+  { value: '', label: 'No status' },
+  { value: 'busy', label: 'Busy' },
+  { value: 'low-stock', label: 'Low stock' },
+  { value: 'maintenance', label: 'Maintenance' },
+  { value: 'closed', label: 'Closed' },
+];
+
+/** Quick-start presets for common zone types. */
+const ZONE_TEMPLATES: { label: string; patch: Partial<Zone> }[] = [
+  {
+    label: 'Warehouse zone',
+    patch: {
+      name: 'Warehouse Zone', shortName: 'Warehouse', icon: 'boxes', color: '#3B82F6',
+      tags: ['warehouse'],
+      safetyNotes: 'High-visibility vest and safety shoes required. Watch for forklift traffic.',
+    },
+  },
+  {
+    label: 'Office room',
+    patch: {
+      name: 'Office Room', shortName: 'Office', icon: 'briefcase', color: '#10B981',
+      tags: ['office'], safetyNotes: '',
+    },
+  },
+  {
+    label: 'Production line',
+    patch: {
+      name: 'Production Line', shortName: 'Production', icon: 'factory', color: '#F59E0B',
+      tags: ['production'],
+      safetyNotes: 'Hearing protection required. Keep clear of moving machinery.',
+    },
+  },
+  {
+    label: 'Safety / first aid',
+    patch: {
+      name: 'First Aid Point', shortName: 'First Aid', icon: 'heart-pulse', color: '#EF4444',
+      tags: ['safety', 'medical'], safetyNotes: '',
+    },
+  },
+  {
+    label: 'Meeting room',
+    patch: {
+      name: 'Meeting Room', shortName: 'Meetings', icon: 'users', color: '#8B5CF6',
+      tags: ['office', 'meetings'], safetyNotes: '',
+    },
+  },
+  {
+    label: 'Stairs / elevator',
+    patch: {
+      name: 'Stairwell', shortName: 'Stairs', icon: 'arrow-up-down', color: '#64748B',
+      tags: ['stairs'], safetyNotes: '',
+    },
+  },
+];
+
 interface ZoneEditorProps {
   floor: Floor;
+  /** All floors of the same building, for the stairs/elevator connector. */
+  buildingFloors: Floor[];
   zone: Zone;
   isNew: boolean;
   onSave: (zone: Zone) => void;
@@ -21,10 +79,18 @@ interface ZoneEditorProps {
 }
 
 /** Full-screen zone editor: fields on the left, polygon drawing on the right. */
-export default function ZoneEditor({ floor, zone, isNew, onSave, onCancel }: ZoneEditorProps) {
+export default function ZoneEditor({
+  floor,
+  buildingFloors,
+  zone,
+  isNew,
+  onSave,
+  onCancel,
+}: ZoneEditorProps) {
   const [z, setZ] = useState<Zone>(zone);
   const patch = (p: Partial<Zone>) => setZ((prev) => ({ ...prev, ...p }));
   const otherZones = floor.zones.filter((x) => x.id !== z.id);
+  const otherFloors = buildingFloors.filter((f) => f.id !== floor.id);
   const valid = z.name.trim().length > 0 && z.shortName.trim().length > 0;
 
   return (
@@ -66,6 +132,25 @@ export default function ZoneEditor({ floor, zone, isNew, onSave, onCancel }: Zon
       <div className="grid flex-1 gap-5 overflow-y-auto p-4 lg:grid-cols-[400px_1fr] lg:overflow-hidden">
         {/* Fields */}
         <div className="space-y-4 lg:overflow-y-auto lg:pr-1">
+          {isNew && (
+            <div>
+              <span className="label flex items-center gap-1.5">
+                <Sparkles className="h-3 w-3" /> Start from a template
+              </span>
+              <div className="flex flex-wrap gap-1.5">
+                {ZONE_TEMPLATES.map((tpl) => (
+                  <button
+                    key={tpl.label}
+                    type="button"
+                    onClick={() => patch(tpl.patch)}
+                    className="rounded-full border border-ink-200 dark:border-ink-700 px-3 py-1 text-[11px] font-semibold text-ink-500 hover:bg-ink-100 dark:hover:bg-ink-800 transition-colors"
+                  >
+                    {tpl.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
           <div className="grid grid-cols-2 gap-3">
             <div className="col-span-2">
               <label className="label" htmlFor="z-name">Zone name</label>
@@ -145,11 +230,62 @@ export default function ZoneEditor({ floor, zone, isNew, onSave, onCancel }: Zon
               onChange={(e) => patch({ safetyNotes: e.target.value || undefined })}
               placeholder="PPE requirements, hazards…" />
           </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="label" htmlFor="z-tags">Tags (comma separated)</label>
+              <input id="z-tags" className="input font-mono text-xs"
+                value={(z.tags ?? []).join(', ')}
+                onChange={(e) =>
+                  patch({
+                    tags: e.target.value
+                      .split(',')
+                      .map((s) => s.trim().toLowerCase())
+                      .filter(Boolean),
+                  })
+                }
+                placeholder="safety, high-traffic" />
+            </div>
+            <div>
+              <label className="label" htmlFor="z-status">Status badge</label>
+              <select id="z-status" className="input"
+                value={z.status ?? ''}
+                onChange={(e) =>
+                  patch({ status: (e.target.value || undefined) as ZoneStatus | undefined })
+                }>
+                {STATUS_OPTIONS.map((o) => (
+                  <option key={o.value} value={o.value}>{o.label}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {otherFloors.length > 0 && (
+            <div>
+              <label className="label" htmlFor="z-connect">
+                Stairs / elevator — connects to floor
+              </label>
+              <select id="z-connect" className="input"
+                value={z.connectsToFloorId ?? ''}
+                onChange={(e) => patch({ connectsToFloorId: e.target.value || undefined })}>
+                <option value="">Not a floor connector</option>
+                {otherFloors.map((f) => (
+                  <option key={f.id} value={f.id}>{f.name}</option>
+                ))}
+              </select>
+            </div>
+          )}
+
           <label className="flex cursor-pointer items-center gap-2.5 text-sm font-medium">
             <input type="checkbox" checked={Boolean(z.isHighlighted)}
               onChange={(e) => patch({ isHighlighted: e.target.checked })}
               className="h-4 w-4 rounded accent-blue-600" />
             Highlight this zone on the map
+          </label>
+          <label className="flex cursor-pointer items-center gap-2.5 text-sm font-medium">
+            <input type="checkbox" checked={Boolean(z.isExit)}
+              onChange={(e) => patch({ isExit: e.target.checked })}
+              className="h-4 w-4 rounded accent-red-600" />
+            Emergency exit (highlighted in Emergency mode)
           </label>
         </div>
 

@@ -3,7 +3,7 @@ import { Download, FileUp, History, RotateCcw, Undo2 } from 'lucide-react';
 import type { AdminDraft } from '../../hooks/useAdminDraft';
 import { countStats } from '../../lib/data';
 import { fireConfetti } from '../../lib/confetti';
-import { formatDate } from '../../lib/utils';
+import { downloadJson, formatDate } from '../../lib/utils';
 
 export default function ExportPanel({ draft }: { draft: AdminDraft }) {
   const data = draft.data!;
@@ -114,6 +114,55 @@ export default function ExportPanel({ draft }: { draft: AdminDraft }) {
           local edits and re-reads the deployed file. Reset restores the demo facility.
         </p>
       </section>
+
+      {/* Version history */}
+      {draft.history.length > 0 && (
+        <section className="card p-6">
+          <h2 className="flex items-center gap-2 font-bold">
+            <History className="h-4 w-4" /> Version history (this browser)
+          </h2>
+          <p className="mt-1 text-xs text-ink-500">
+            The last {draft.history.length} exports, newest first. Download any version
+            or restore it into the draft.
+          </p>
+          <ul className="mt-4 space-y-2">
+            {draft.history.map((v, i) => (
+              <li
+                key={v.ts}
+                className="flex flex-wrap items-center gap-2 rounded-xl border border-ink-100 dark:border-ink-800 px-4 py-3"
+              >
+                <span className="min-w-0 flex-1 text-sm font-semibold">
+                  {formatDate(v.ts)}
+                  {i === 0 && (
+                    <span className="ml-2 rounded-md bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-bold uppercase text-emerald-600 dark:text-emerald-400">
+                      Latest
+                    </span>
+                  )}
+                </span>
+                <button
+                  type="button"
+                  className="btn-outline !px-3 !py-1.5 !text-xs"
+                  onClick={() =>
+                    downloadJson(v.data, `map-data-v${draft.history.length - i}.json`)
+                  }
+                >
+                  <Download className="h-3.5 w-3.5" /> Download
+                </button>
+                <button
+                  type="button"
+                  className="btn-ghost !px-3 !py-1.5 !text-xs"
+                  onClick={() => {
+                    if (confirm(`Restore the export from ${formatDate(v.ts)} into the draft?`))
+                      draft.restoreVersion(v);
+                  }}
+                >
+                  <RotateCcw className="h-3.5 w-3.5" /> Restore
+                </button>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
     </div>
   );
 }

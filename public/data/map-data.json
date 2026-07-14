@@ -9,7 +9,7 @@
   "address": "Industrial Zone 4, Biyagama, Sri Lanka",
   "website": "https://lankatyre.example",
   "welcomeMessage": "Welcome aboard! Tap any zone on the map to learn what happens there, who to contact, and what safety gear you need.",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "lastUpdated": "2026-07-13T12:00:00Z",
   "buildings": [
     {
@@ -37,7 +37,16 @@
               "polygon": [[100, 300], [700, 300], [700, 900], [100, 900]],
               "center": [400, 600],
               "photo": "/photos/inventory.svg",
-              "isHighlighted": false
+              "isHighlighted": false,
+              "tags": ["warehouse", "high-traffic"],
+              "status": "busy",
+              "translations": {
+                "si": {
+                  "name": "ප්‍රධාන තොග අංශය",
+                  "shortName": "තොග",
+                  "description": "අමුද්‍රව්‍ය සහ නිමි භාණ්ඩ සඳහා මධ්‍යම ගබඩාව. ආරක්ෂිත සපත්තු අනිවාර්යයි."
+                }
+              }
             },
             {
               "id": "z-bamburio",
@@ -50,7 +59,8 @@
               "safetyNotes": "Hearing protection required. Keep clear of the yellow robot envelope markings.",
               "polygon": [[780, 300], [1300, 300], [1300, 780], [780, 780]],
               "center": [1040, 540],
-              "isHighlighted": false
+              "isHighlighted": false,
+              "tags": ["production", "high-traffic"]
             },
             {
               "id": "z-qc",
@@ -63,7 +73,8 @@
               "safetyNotes": "Lab coats and safety glasses required beyond the blue line.",
               "polygon": [[1380, 300], [1880, 300], [1880, 640], [1380, 640]],
               "center": [1630, 470],
-              "isHighlighted": false
+              "isHighlighted": false,
+              "tags": ["lab", "restricted"]
             },
             {
               "id": "z-shipping",
@@ -76,7 +87,9 @@
               "safetyNotes": "Dock edges are fall hazards. Never stand behind a reversing truck — use the banksman.",
               "polygon": [[1380, 720], [1880, 720], [1880, 1080], [1380, 1080]],
               "center": [1630, 900],
-              "isHighlighted": false
+              "isHighlighted": false,
+              "isExit": true,
+              "tags": ["logistics", "high-traffic"]
             },
             {
               "id": "z-canteen",
@@ -89,7 +102,15 @@
               "polygon": [[100, 980], [560, 980], [560, 1300], [100, 1300]],
               "center": [330, 1140],
               "photo": "/photos/canteen.svg",
-              "isHighlighted": false
+              "isHighlighted": false,
+              "tags": ["food", "break-area"],
+              "translations": {
+                "si": {
+                  "name": "කාර්ය මණ්ඩල ආපනශාලාව",
+                  "shortName": "ආපනශාලාව",
+                  "description": "ආහාර වේල්, තේ විවේක සහ කලාපයේ හොඳම ඉඳිආප්ප."
+                }
+              }
             },
             {
               "id": "z-firstaid",
@@ -102,7 +123,15 @@
               "safetyNotes": "In an emergency call 999 from any internal phone, then send a runner here.",
               "polygon": [[640, 980], [900, 980], [900, 1300], [640, 1300]],
               "center": [770, 1140],
-              "isHighlighted": false
+              "isHighlighted": false,
+              "tags": ["safety", "medical"],
+              "translations": {
+                "si": {
+                  "name": "ප්‍රථමාධාර සහ වෛද්‍ය කාමරය",
+                  "shortName": "ප්‍රථමාධාර",
+                  "description": "සෑම වැඩමුරයකම පුහුණු වෛද්‍ය සහායකයෙකු සිටින ප්‍රථමාධාර මධ්‍යස්ථානය."
+                }
+              }
             },
             {
               "id": "z-entrance",
@@ -114,7 +143,28 @@
               "details": "• All visitors must sign in here\n• Lockers available for personal items\n• Scan the wall QR to reopen this map anytime",
               "polygon": [[980, 1140], [1300, 1140], [1300, 1320], [980, 1320]],
               "center": [1140, 1230],
-              "isHighlighted": false
+              "isHighlighted": false,
+              "isExit": true,
+              "tags": ["entrance", "safety"],
+              "translations": {
+                "si": {
+                  "name": "ප්‍රධාන පිවිසුම සහ පිළිගැනීම",
+                  "shortName": "පිවිසුම",
+                  "description": "ආරක්ෂක ලියාපදිංචිය, අමුත්තන්ගේ බැජ් සහ QR ආරම්භක ස්ථානය."
+                }
+              }
+            },
+            {
+              "id": "z-stairs-g",
+              "name": "Stairwell A",
+              "shortName": "Stairs",
+              "color": "#64748B",
+              "icon": "arrow-up-down",
+              "description": "Main stairwell connecting the ground and first floors.",
+              "polygon": [[1340, 1140], [1500, 1140], [1500, 1320], [1340, 1320]],
+              "center": [1420, 1230],
+              "connectsToFloorId": "f2",
+              "tags": ["stairs"]
             }
           ]
         },
@@ -136,7 +186,8 @@
               "details": "• Current shift: Morning A\n• Today's target: 4,200 units\n• Planning stand-up at 08:15 daily",
               "polygon": [[100, 300], [700, 300], [700, 760], [100, 760]],
               "center": [400, 530],
-              "isHighlighted": false
+              "isHighlighted": false,
+              "tags": ["office", "planning"]
             },
             {
               "id": "z-admin",
@@ -148,7 +199,8 @@
               "details": "• HR desk hours: 08:00 – 17:00\n• Contact: hr@lankatyre.example\n• Bring your NIC for onboarding",
               "polygon": [[780, 300], [1300, 300], [1300, 760], [780, 760]],
               "center": [1040, 530],
-              "isHighlighted": false
+              "isHighlighted": false,
+              "tags": ["office", "hr"]
             },
             {
               "id": "z-meeting",
@@ -160,7 +212,9 @@
               "details": "• Book via reception or the wall tablets\n• M4 has video conferencing",
               "polygon": [[1380, 300], [1880, 300], [1880, 760], [1380, 760]],
               "center": [1630, 530],
-              "isHighlighted": false
+              "isHighlighted": false,
+              "tags": ["office", "meetings"],
+              "status": "busy"
             },
             {
               "id": "z-rnd",
@@ -173,7 +227,20 @@
               "safetyNotes": "Authorized personnel only. Chemical storage inside — no food or drink.",
               "polygon": [[100, 860], [900, 860], [900, 1300], [100, 1300]],
               "center": [500, 1080],
-              "isHighlighted": false
+              "isHighlighted": false,
+              "tags": ["lab", "restricted"]
+            },
+            {
+              "id": "z-stairs-1",
+              "name": "Stairwell A",
+              "shortName": "Stairs",
+              "color": "#64748B",
+              "icon": "arrow-up-down",
+              "description": "Main stairwell connecting the first and ground floors.",
+              "polygon": [[930, 1150], [1130, 1150], [1130, 1290], [930, 1290]],
+              "center": [1030, 1220],
+              "connectsToFloorId": "f1",
+              "tags": ["stairs"]
             }
           ]
         }
@@ -203,7 +270,9 @@
               "safetyNotes": "High-stacked racking — hard hats mandatory in all aisles.",
               "polygon": [[100, 250], [900, 250], [900, 950], [100, 950]],
               "center": [500, 600],
-              "isHighlighted": false
+              "isHighlighted": false,
+              "tags": ["warehouse"],
+              "status": "low-stock"
             },
             {
               "id": "z-packaging",
@@ -216,7 +285,9 @@
               "safetyNotes": "Keep hands clear of the stretch-wrap turntable while it is in motion.",
               "polygon": [[980, 250], [1500, 250], [1500, 950], [980, 950]],
               "center": [1240, 600],
-              "isHighlighted": false
+              "isHighlighted": false,
+              "isExit": true,
+              "tags": ["production", "logistics"]
             }
           ]
         }

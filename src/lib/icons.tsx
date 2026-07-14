@@ -1,5 +1,6 @@
 import {
   Archive,
+  ArrowUpDown,
   Boxes,
   Briefcase,
   Calendar,
@@ -52,6 +53,7 @@ export const ZONE_ICONS: Record<string, LucideIcon> = {
   zap: Zap,
   printer: Printer,
   recycle: Recycle,
+  'arrow-up-down': ArrowUpDown,
 };
 
 export const ZONE_ICON_NAMES = Object.keys(ZONE_ICONS);

@@ -20,25 +20,53 @@ all content lives in a single static file: [`public/data/map-data.json`](public/
 - Tappable colored zone polygons over a pure-SVG floor plan (no map-tile libraries)
 - Bottom sheet with description, expandable details, safety warnings, photos,
   **Get directions** (animated route from the scanned location) and **Share location** deep links
-- Building & floor switchers, live zone search, dark/light mode, "last updated" badge
+- Building & floor switchers with smooth cross-fade; **stairs/elevator zones**
+  offer a one-tap jump to the connected floor (`connectsToFloorId`)
+- Live zone search with **#tag filters**, plus **favorites (star)** and
+  **recently viewed** — persisted on the device, surfaced in search and on the landing page
+- **Emergency mode**: a red siren button highlights every `isExit` zone and dims the rest
+- **English / සිංහල toggle** — UI strings are built in; per-zone translations
+  live in the JSON (`zone.translations.si`)
+- **Status badges** (`busy`, `low-stock`, `maintenance`, `closed`) as pulsing
+  dots on map labels and colored chips in the sheet
+- **Personal notes** per zone, stored only in the visitor's browser
+- Dark/light mode, "last updated" badge
 - Deep links: `#/map?building=b1&floor=f1&zone=z-inventory&here=z-entrance`
+  (`highlight=` works as an alias for `zone=`)
+
+### PWA / offline
+- Installable to the home screen (`manifest.webmanifest`)
+- Service worker caches the app shell, floor plans and photos **cache-first**,
+  and `map-data.json` **network-first with offline fallback** — after the first
+  visit the map works with no signal. Bump `CACHE_VERSION` in `public/sw.js`
+  to force-refresh clients.
 
 ### Admin panel (`#/admin`, password-protected)
 - Dashboard with building/floor/zone counts and last export date
 - **Settings**: company name, app name, logo (upload or path), brand color, tagline,
   welcome message, contact email/phone/address/website — all stored in the JSON
 - Full CRUD for buildings, floors (incl. map image upload with auto width/height) and zones
+- **Zone templates** (warehouse, office, production line, first aid, meeting
+  room, stairs) to start new zones with sensible defaults
+- Zone fields for **tags**, **status badge**, **emergency exit** flag and the
+  **stairs/elevator floor connector**
 - **Visual polygon editor**: click the floor plan to add points, drag to adjust,
   auto-calculated center, live color preview, other zones shown as context
 - Live preview tab rendering the real public map from your draft
 - **Export map-data.json** (with confetti 🎉), **Import** a previous file,
   **Reset to sample data**, **Discard draft**
+- **Version history**: the last 5 exports are kept in the browser and can be
+  re-downloaded (`map-data-v2.json`, …) or restored into the draft
+- **Most-viewed zones** insight on the dashboard (view counts recorded locally
+  on each device — no tracking, no server)
 - Drafts auto-save to `localStorage` — nothing is public until you export
 
 ### QR generator (`#/qr`)
 - Pure-frontend QR codes (no external service) for any building/floor,
   optionally pinned to a "You are here" zone
 - Printable poster layout, PNG download, copy-link
+- **QR gallery**: one "You are here" code for every zone, downloadable
+  individually or printed as a single sheet
 
 ---
 

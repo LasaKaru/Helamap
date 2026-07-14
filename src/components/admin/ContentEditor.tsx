@@ -258,9 +258,10 @@ export default function ContentEditor({ draft }: { draft: AdminDraft }) {
       </Panel>
 
       {/* Zone editor overlay */}
-      {editingZone && floor && (
+      {editingZone && floor && building && (
         <ZoneEditor
           floor={floor}
+          buildingFloors={building.floors}
           zone={editingZone.zone}
           isNew={editingZone.isNew}
           onCancel={() => setEditingZone(null)}

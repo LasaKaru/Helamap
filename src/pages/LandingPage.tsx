@@ -1,18 +1,24 @@
+import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   ArrowRight,
+  Clock,
   Compass,
   Lock,
-  Map,
+  Map as MapIcon,
   QrCode,
   ScanLine,
   ShieldCheck,
   Smartphone,
+  Star,
   Zap,
 } from 'lucide-react';
 import { useMapData } from '../hooks/useMapData';
-import { countStats } from '../lib/data';
+import { allZones, countStats } from '../lib/data';
+import { getFavorites, getRecents } from '../lib/prefs';
+import { useI18n } from '../lib/i18n';
+import { ZoneIcon } from '../lib/icons';
 import Logo from '../components/ui/Logo';
 import ThemeToggle from '../components/ui/ThemeToggle';
 
@@ -88,7 +94,7 @@ export default function LandingPage() {
             className="mt-8 flex flex-wrap items-center justify-center gap-3"
           >
             <Link to="/map" className="btn-primary !px-6 !py-3 !text-base">
-              <Map className="h-5 w-5" />
+              <MapIcon className="h-5 w-5" />
               Open the map
               <ArrowRight className="h-4 w-4" />
             </Link>
@@ -109,6 +115,8 @@ export default function LandingPage() {
               <Stat value={stats.zones} label="Zones" />
             </motion.div>
           )}
+
+          {data && <SavedZones data={data} />}
         </section>
 
         {/* Features */}
@@ -170,6 +178,57 @@ export default function LandingPage() {
         </div>
       </footer>
     </div>
+  );
+}
+
+/** Starred + recently viewed zones from this device, as one-tap map links. */
+function SavedZones({ data }: { data: NonNullable<ReturnType<typeof useMapData>['data']> }) {
+  const { t } = useI18n();
+  const entries = useMemo(() => {
+    const byId = new Map(allZones(data).map((r) => [r.zone.id, r]));
+    const favs = getFavorites()
+      .map((id) => byId.get(id))
+      .filter(Boolean)
+      .map((r) => ({ r: r!, fav: true }));
+    const favIds = new Set(favs.map((e) => e.r.zone.id));
+    const recents = getRecents()
+      .filter((id) => !favIds.has(id))
+      .map((id) => byId.get(id))
+      .filter(Boolean)
+      .map((r) => ({ r: r!, fav: false }));
+    return [...favs, ...recents].slice(0, 6);
+  }, [data]);
+
+  if (entries.length === 0) return null;
+
+  return (
+    <motion.div {...fadeUp} transition={{ duration: 0.5, delay: 0.4 }} className="mt-10">
+      <p className="text-[11px] font-bold uppercase tracking-wider text-ink-400">
+        {t.favorites} · {t.recent}
+      </p>
+      <div className="mt-3 flex flex-wrap justify-center gap-2">
+        {entries.map(({ r, fav }) => (
+          <Link
+            key={r.zone.id}
+            to={`/map?building=${r.building.id}&floor=${r.floor.id}&zone=${r.zone.id}`}
+            className="glass flex items-center gap-2 rounded-full py-1.5 pl-1.5 pr-3.5 text-xs font-semibold transition-transform hover:scale-105"
+          >
+            <span
+              className="flex h-6 w-6 items-center justify-center rounded-full text-white"
+              style={{ backgroundColor: r.zone.color }}
+            >
+              <ZoneIcon name={r.zone.icon} className="h-3.5 w-3.5" />
+            </span>
+            {r.zone.shortName}
+            {fav ? (
+              <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
+            ) : (
+              <Clock className="h-3 w-3 text-ink-400" />
+            )}
+          </Link>
+        ))}
+      </div>
+    </motion.div>
   );
 }
 
